@@ -1,0 +1,139 @@
+/*
+ * Chinese web fonts, self-hosted (Fontsource) so the strict CSP needs no external sources.
+ * Google Fonts via @import url() is dropped: Hozu puts its own rules first, and @import must come first.
+ * @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap');
+ */
+@import "@fontsource-variable/noto-sans-tc";
+@import "@fontsource-variable/noto-serif-tc";
+/* 2026-10-05: section titles now share the page title's Noto Serif TC; LXGW WenKai TC removed.
+ * @import "@fontsource/lxgw-wenkai-tc/700.css";
+ */
+@import "tailwindcss";
+
+/*
+ * Semantic colour tokens: coffee browns on a cream linen texture, Morandi slate blue as the accent
+ * ("brand"), caramel for fruit and highlights ("accent"). No black. One palette for every colour scheme (2026-10-05: dark mode dropped on request).
+ * Text tokens are the darker shades so every pair meets WCAG AA 4.5:1.
+ */
+@theme {
+  --font-sans: 'Noto Sans TC Variable', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
+  --font-serif: 'Noto Serif TC Variable', 'Songti TC', 'PMingLiU', serif;
+  /* --font-display: 'LXGW WenKai TC', 'Kaiti TC', 'DFKai-SB', serif; */
+
+  --color-canvas: #ede6da;
+  /* Slightly translucent so the linen shows through the cards. */
+  --color-surface: rgb(251 247 240 / 0.92);
+  --color-line: #e3d6c6;
+  --color-ink: #3e2c23;
+  --color-ink-muted: #6f5b4b;
+  --color-brand: #4a6274;
+  --color-brand-strong: #3d5263;
+  --color-brand-soft: #dce3e8;
+  --color-on-brand: #fbf7f0;
+  --color-accent: #a0704a;
+  --color-accent-strong: #8a5a35;
+  --color-accent-soft: #f1e2d0;
+  --color-accent-surface: #f7eee3;
+  --color-accent-line: #e6d2bc;
+  /* Fruit label: Morandi green (the caramel was too faint on linen). */
+  --color-fruit-strong: #4f6656;
+  --color-fruit-soft: #dde5da;
+  /* "比近 30 天便宜" price drops: violet, 5.5:1 on the cream cards. */
+  --color-bargain: #6b5a8e;
+}
+
+/* Vertical section titles (直排), as in traditional Chinese layouts. */
+@utility vertical-rl {
+  writing-mode: vertical-rl;
+}
+
+body {
+  background-color: var(--color-canvas);
+  /* Linen texture (assets/linen.jpg), tiled; the canvas colour shows while it loads. */
+  background-image: url('./assets/linen.jpg');
+  background-size: 480px auto;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+/* ---- 咖啡色系深色模式（2026-10-05 依需求移除，布紋一律顯示） ----
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-canvas: #2b211b;
+    --color-surface: rgb(54 42 34 / 0.94);
+    --color-line: #4e3d31;
+    --color-ink: #f1e7da;
+    --color-ink-muted: #cbb9a6;
+    --color-brand: #8fa7b8;
+    --color-brand-strong: #a9bdcb;
+    --color-brand-soft: #34424d;
+    --color-on-brand: #2b211b;
+    --color-accent: #d3a27a;
+    --color-accent-strong: #ddb48f;
+    --color-accent-soft: #4a3526;
+    --color-accent-surface: #3a2c22;
+    --color-accent-line: #5e4532;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    /* A coffee wash over the same linen keeps the texture without going black. *\/
+    background-image: linear-gradient(rgb(43 33 27 / 0.9), rgb(43 33 27 / 0.9)), url('./assets/linen.jpg');
+    background-size: auto, 480px auto;
+  }
+}
+*/
+
+/* ---- 咖啡色系改版前的配色（2026-10-05） ----
+/*
+ * Semantic colour tokens (Organic Biophilic: fresh green + harvest amber).
+ * Text tokens are the darker shades so every pair meets WCAG AA 4.5:1.
+ *\/
+@theme {
+  --font-sans: 'Noto Sans TC Variable', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
+  --font-serif: 'Noto Serif TC Variable', 'Songti TC', 'PMingLiU', serif;
+
+  --color-canvas: #ecfdf5;
+  --color-surface: #ffffff;
+  --color-line: #d1eadf;
+  --color-ink: #0f172a;
+  --color-ink-muted: #475569;
+  --color-brand: #059669;
+  --color-brand-strong: #047857;
+  --color-brand-soft: #d1fae5;
+  --color-on-brand: #ffffff;
+  --color-accent: #d97706;
+  --color-accent-strong: #b45309;
+  --color-accent-soft: #fef3c7;
+  --color-accent-surface: #fffbeb;
+  --color-accent-line: #fde68a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-canvas: #0b1512;
+    --color-surface: #12211c;
+    --color-line: #24423a;
+    --color-ink: #e7f5ef;
+    --color-ink-muted: #a7bdb4;
+    --color-brand: #34d399;
+    --color-brand-strong: #6ee7b7;
+    --color-brand-soft: #0f3b2e;
+    --color-on-brand: #052e1f;
+    --color-accent: #fbbf24;
+    --color-accent-strong: #fcd34d;
+    --color-accent-soft: #3b2a08;
+    --color-accent-surface: #1a1408;
+    --color-accent-line: #5c4310;
+  }
+}
+
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+*/

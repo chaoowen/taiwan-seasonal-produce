@@ -1,0 +1,33 @@
+{
+  "name": "my-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "hozu dev",
+    "check": "hozu check",
+    "start": "hozu serve",
+    "build": "hozu build"
+  },
+  "dependencies": {
+    "@fontsource-variable/noto-sans-tc": "^5.3.0",
+    "@fontsource-variable/noto-serif-tc": "^5.3.0",
+    "@hozu/adapter-node": "^0.17.1",
+    "@hozu/cli": "^0.17.1",
+    "@hozu/core": "^0.17.1",
+    "@hozu/css": "^0.17.1",
+    "@hozu/data": "^0.17.1",
+    "@hozu/runtime-server": "^0.17.1",
+    "@hozu/schema-zod": "^0.17.1",
+    "@hozu/transform": "^0.17.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@hozu/dev": "^0.17.1",
+    "@hozu/testing": "^0.17.1",
+    "@types/node": "^22.20.4",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=22.18"
+  }
+}
