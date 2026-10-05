@@ -4,7 +4,8 @@
  */
 import { createHandler } from '@hozu/runtime-server'
 import app from '../app.ts'
-import manifest from '../dist/manifest.json' with { type: 'json' }
+// hozu build's manifest with the irHash of this bundle (written by scripts/worker-manifest.ts).
+import manifest from '../dist/worker/manifest.json' with { type: 'json' }
 import * as render from '../dist/server/render.js'
 import snapshot from '../.cache/price-snapshot.json' with { type: 'json' }
 import { usePriceSnapshot, type PriceSnapshot } from '../features/produce/prices.ts'
