@@ -48,6 +48,14 @@ async function loadPrices(items: CatalogItem[]): Promise<Map<string, ItemPrice>>
   }
 }
 
+function toCatalogCard(item: CatalogItem, month: number, prices: Map<string, ItemPrice>) {
+  return {
+    ...toProduce(item, month, prices.get(item.id) ?? null),
+    seasonText: getSeasonText(item.months),
+    isInSeason: item.months.includes(month),
+  }
+}
+
 /**
  * Finds catalog items whose name or alias contains `q`, whatever the season,
  * with today's wholesale price when the crop traded recently.
@@ -60,10 +68,13 @@ export async function searchCatalog(q: string, now: Date = new Date()) {
   return {
     query,
     catalogSize: CATALOG.length,
-    results: matches.map((item) => ({
-      ...toProduce(item, month, prices.get(item.id) ?? null),
-      seasonText: getSeasonText(item.months),
-      isInSeason: item.months.includes(month),
-    })),
+    results: matches.map((item) => toCatalogCard(item, month, prices)),
   }
+}
+
+/** Every catalog item as a card (for the favourites page, which picks the saved ones in the browser). */
+export async function listCatalogCards(now: Date = new Date()) {
+  const { month } = getTaipeiDate(now)
+  const prices = await loadPrices(CATALOG)
+  return CATALOG.map((item) => toCatalogCard(item, month, prices))
 }

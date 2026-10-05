@@ -1,6 +1,6 @@
 import { part, ui } from '@hozu/core'
 import type { z } from 'zod'
-import { home } from '../../routes.ts'
+import { favoritesPage, home, searchPage } from '../../routes.ts'
 import {
   appleIcon,
   calendarIcon,
@@ -9,8 +9,10 @@ import {
   searchIcon,
   sproutIcon,
 } from './icons.ts'
+import { FavoriteButton, FavoritesList } from './components.ts'
 import {
   getToday,
+  listCatalog,
   searchProduce,
   type MonthOption,
   type Produce,
@@ -23,6 +25,7 @@ import {
 type Item = z.infer<typeof Produce>
 type TodayData = z.infer<typeof Today>
 type ShowValue = z.infer<typeof ShowOption>['value']
+type CatalogCard = z.infer<typeof SearchResult>
 
 // ---- Small pieces ----
 
@@ -69,15 +72,23 @@ const cornerDot = part(() =>
   ui.span({ class: 'absolute -top-2 -right-2 size-4 rounded-full bg-ink-muted', 'aria-hidden': 'true' }, []),
 )
 
+/** ♡ that saves the item in this browser; it only appears once JavaScript runs. */
+const favoriteToggle = part((item: Item) =>
+  ui.use(FavoriteButton, { props: { id: item.id, name: item.name }, class: '-my-2 -mr-2 inline-flex shrink-0' }),
+)
+
 // ---- Item cards ----
 
 const pickCard = part((item: Item) =>
   ui.li({ class: `${cardFrame} flex flex-col gap-3 p-5` }, [
     cornerDot(),
-    ui.div({ class: 'flex flex-wrap items-center gap-2' }, [
-      kindBadge(item),
-      item.isPeak && reasonBadge('盛產期'),
-      item.isCheap && reasonBadge('價格划算'),
+    ui.div({ class: 'flex items-start gap-2' }, [
+      ui.div({ class: 'flex flex-1 flex-wrap items-center gap-2' }, [
+        kindBadge(item),
+        item.isPeak && reasonBadge('盛產期'),
+        item.isCheap && reasonBadge('價格划算'),
+      ]),
+      favoriteToggle(item),
     ]),
     ui.h3({ class: 'font-serif text-2xl font-bold text-ink' }, [item.name]),
     ui.p({ class: 'flex items-center gap-1.5 text-base text-ink-muted' }, [mapPinIcon(), item.origin]),
@@ -93,7 +104,10 @@ const pickCard = part((item: Item) =>
 const produceCard = part((item: Item) =>
   ui.li({ class: `${cardFrame} flex flex-col gap-1.5 p-4` }, [
     cornerDot(),
-    ui.h3({ class: 'font-serif text-lg font-bold text-ink' }, [item.name]),
+    ui.div({ class: 'flex items-start justify-between gap-2' }, [
+      ui.h3({ class: 'font-serif text-lg font-bold text-ink' }, [item.name]),
+      favoriteToggle(item),
+    ]),
     ui.p({ class: 'flex items-center gap-1 text-sm text-ink-muted' }, [mapPinIcon(), item.origin]),
     item.priceLabel !== null &&
       ui.p({ class: 'mt-auto pt-1 text-base font-medium text-ink tabular-nums' }, [item.priceLabel]),
@@ -101,12 +115,16 @@ const produceCard = part((item: Item) =>
   ]),
 )
 
-const searchCard = part((item: z.infer<typeof SearchResult>) =>
-  ui.li({ class: `${cardFrame} flex flex-col gap-3 p-5` }, [
+/** A whole-catalog card (search and favourites). `isHidden` cards wait for the favourites script. */
+const catalogCard = part((item: CatalogCard, isHidden: boolean) =>
+  ui.li({ class: `${cardFrame} flex flex-col gap-3 p-5`, hidden: isHidden, 'data-produce-id': item.id }, [
     cornerDot(),
-    ui.div({ class: 'flex flex-wrap items-center gap-2' }, [
-      kindBadge(item),
-      reasonBadge(item.isInSeason ? '本月當季' : '非當季'),
+    ui.div({ class: 'flex items-start gap-2' }, [
+      ui.div({ class: 'flex flex-1 flex-wrap items-center gap-2' }, [
+        kindBadge(item),
+        reasonBadge(item.isInSeason ? '本月當季' : '非當季'),
+      ]),
+      favoriteToggle(item),
     ]),
     ui.h3({ class: 'font-serif text-2xl font-bold text-ink' }, [item.name]),
     ui.p({ class: 'flex items-center gap-1.5 text-base text-ink-muted' }, [mapPinIcon(), item.origin]),
@@ -136,7 +154,7 @@ const cardGrid = 'grid gap-5 sm:grid-cols-2 xl:grid-cols-3'
 const smallCardGrid = 'grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4'
 
 const listSection = part((title: string, subtitle: string, info: string, items: Item[]) =>
-  ui.section({ class: 'grid gap-6 border-t border-line pt-10 md:grid-cols-[auto_1fr] md:gap-12' }, [
+  ui.section({ class: sectionShell }, [
     sectionHeading(title, subtitle),
     ui.div({ class: 'space-y-6' }, [
       ui.p({ class: 'text-sm text-ink-muted' }, [info]),
@@ -158,7 +176,7 @@ const priceNote = part((today: TodayData) =>
 )
 
 const picksSection = part((today: TodayData) =>
-  ui.section({ class: 'grid gap-6 border-t border-line pt-10 md:grid-cols-[auto_1fr] md:gap-12' }, [
+  ui.section({ class: sectionShell }, [
     sectionHeading('當月建議購買', '盛產又划算的好選擇'),
     ui.div({ class: 'space-y-6' }, [
       ui.div({ class: 'space-y-1' }, [
@@ -180,26 +198,81 @@ const picksSection = part((today: TodayData) =>
   ]),
 )
 
-const searchSection = part((result: z.infer<typeof ProduceSearch>) =>
-  result.query === ''
-    ? null
-    : ui.section(
-    { 'aria-live': 'polite', class: 'grid gap-6 border-t border-line pt-10 md:grid-cols-[auto_1fr] md:gap-12' },
-    [
-      sectionHeading('搜尋結果', '找找挑選的訣竅'),
-      ui.div({ class: 'space-y-6' }, [
-        ui.p({ class: 'text-base text-ink' }, [
-          result.results.length === 0
+const sectionShell = 'grid gap-6 border-t border-line pt-10 md:grid-cols-[auto_1fr] md:gap-12'
+
+const searchResults = part((result: z.infer<typeof ProduceSearch>) =>
+  ui.section({ 'aria-live': 'polite', class: sectionShell }, [
+    sectionHeading('搜尋結果', '找找挑選的訣竅'),
+    ui.div({ class: 'space-y-6' }, [
+      ui.p({ class: 'text-base text-ink' }, [
+        result.query === ''
+          ? `輸入蔬果名稱就能查產季、批發價和挑選技巧。目前收錄 ${result.catalogSize} 種，也可以用官方品名，例如「甘藍」。`
+          : result.results.length === 0
             ? `找不到「${result.query}」。目前收錄 ${result.catalogSize} 種台灣常見蔬果，可以換個名稱試試，例如「甘藍」或「番石榴」。`
             : `「${result.query}」找到 ${result.results.length} 項`,
-        ]),
-        ui.ul({ class: cardGrid }, [ui.each(result.results, 'id', (item) => searchCard(item))]),
       ]),
-    ],
-  ),
+      ui.ul({ class: cardGrid }, [ui.each(result.results, 'id', (item) => catalogCard(item, false))]),
+    ]),
+  ]),
+)
+
+/** Every catalog card, hidden; FavoritesList's script shows the saved ones (or the empty message). */
+const favoritesSection = part((cards: CatalogCard[]) =>
+  ui.section({ class: sectionShell }, [
+    sectionHeading('我的收藏', '收藏的時令好物'),
+    ui.use(FavoritesList, { class: 'space-y-6' }, [
+      ui.p({ class: 'text-base text-ink-muted', 'data-favorites-loading': '' }, [
+        '收藏存在你的瀏覽器裡（localStorage），需要啟用 JavaScript 才能顯示。',
+      ]),
+      ui.div({ class: 'space-y-3', hidden: true, 'data-favorites-empty': '' }, [
+        ui.p({ class: 'text-base text-ink' }, ['還沒有收藏任何蔬果。在卡片右上角按 ♡ 就能收藏。']),
+        ui.a({ href: ui.link(home, null), class: 'inline-flex min-h-11 items-center text-base font-medium text-brand-strong underline underline-offset-4' }, [
+          '去看本月當季蔬果',
+        ]),
+      ]),
+      ui.ul({ class: cardGrid }, [ui.each(cards, 'id', (item) => catalogCard(item, true))]),
+      ui.p({ class: 'text-sm text-ink-muted' }, ['收藏只存在這台裝置的這個瀏覽器；清除瀏覽資料或換裝置後就不會保留。']),
+    ]),
+  ]),
 )
 
 // ---- Header ----
+
+type PageName = 'home' | 'search' | 'favorites'
+
+const navLink = part((label: string, href: ReturnType<typeof ui.link>, isCurrent: boolean) =>
+  ui.a(
+    {
+      href,
+      'aria-current': isCurrent ? 'page' : 'false',
+      // Text links: an underline on hover, and a fixed one on the current page (styled through aria-current).
+      class:
+        'inline-flex min-h-11 items-center px-1 text-base font-medium text-brand-strong underline-offset-8 decoration-2 transition-colors duration-200 hover:underline active:text-brand aria-[current=page]:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+    },
+    [label],
+  ),
+)
+
+/** Site title (links home) and the page navigation, fixed to the top of every page. */
+const siteHeader = part((page: PageName) =>
+  ui.div({ class: 'fixed inset-x-0 top-0 z-40 border-b border-line bg-canvas/95 backdrop-blur-sm' }, [
+    ui.div({ class: 'mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-3 sm:px-6' }, [
+    ui.a({ href: ui.link(home, null), class: 'rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand' }, [
+      ui.p({ class: 'flex items-center gap-3 font-serif text-2xl font-bold text-brand-strong sm:text-3xl' }, [
+        sproutIcon(),
+        '台灣當季蔬果',
+      ]),
+    ]),
+    ui.nav({ 'aria-label': '網站導覽' }, [
+      ui.ul({ class: 'flex gap-5' }, [
+        ui.li({}, [navLink('首頁', ui.link(home, null), page === 'home')]),
+        ui.li({}, [navLink('搜尋', ui.link(searchPage, null), page === 'search')]),
+        ui.li({}, [navLink('我的收藏', ui.link(favoritesPage, null), page === 'favorites')]),
+      ]),
+    ]),
+    ]),
+  ]),
+)
 
 const dateCard = part((today: TodayData) =>
   ui.div({ class: 'flex flex-wrap items-end justify-between gap-4 rounded-3xl bg-surface p-6 shadow-sm' }, [
@@ -216,11 +289,11 @@ const dateCard = part((today: TodayData) =>
   ]),
 )
 
-const monthChip = part((option: z.infer<typeof MonthOption>, show: ShowValue, q: string | null) =>
+const monthChip = part((option: z.infer<typeof MonthOption>, show: ShowValue) =>
   ui.li({}, [
     ui.a(
       {
-        href: ui.link(home, null, { month: option.month, show, q }),
+        href: ui.link(home, null, { month: option.month, show }),
         'aria-current': option.isSelected,
         class:
           'inline-flex min-h-11 min-w-14 items-center justify-center gap-1 rounded-full border px-3 text-base font-medium transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
@@ -238,32 +311,28 @@ const monthChip = part((option: z.infer<typeof MonthOption>, show: ShowValue, q:
   ]),
 )
 
-const monthNav = part((today: TodayData, q: string | null) =>
+const monthNav = part((today: TodayData) =>
   ui.nav({ 'aria-label': '切換月份', class: 'space-y-3' }, [
     ui.div({ class: 'flex flex-wrap items-center justify-between gap-2' }, [
       ui.p({ class: 'text-base font-medium text-ink' }, ['想看其他月份？']),
       !today.isCurrentMonth &&
         ui.a(
           {
-            href: ui.link(home, null, { show: today.show, q }),
+            href: ui.link(home, null, { show: today.show }),
             class:
               'inline-flex min-h-11 items-center rounded-full px-3 text-base font-medium text-brand-strong underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-brand',
           },
           ['回到本月'],
         ),
     ]),
-    ui.ul({ class: 'flex flex-wrap gap-2' }, [ui.each(today.months, 'id', (option) => monthChip(option, today.show, q))]),
+    ui.ul({ class: 'flex flex-wrap gap-2' }, [ui.each(today.months, 'id', (option) => monthChip(option, today.show))]),
   ]),
 )
 
-/** A plain GET form: submitting reloads the page with `?q=`, so search works without JavaScript. */
-const searchForm = part((month: number | null, q: string | null, show: ShowValue) =>
-  ui.form({ method: 'get', role: 'search', class: 'space-y-2' }, [
-    ui.label({ for: 'produce-search', class: 'block text-base font-medium text-ink' }, [
-      '查挑選技巧（不限當季）',
-    ]),
-    month !== null && ui.input({ type: 'hidden', name: 'month', value: `${month}` }),
-    show !== 'all' && ui.input({ type: 'hidden', name: 'show', value: show }),
+/** A plain GET form to the search page (`/search?q=`), so search works without JavaScript. */
+const searchForm = part((q: string | null) =>
+  ui.form({ method: 'get', action: ui.link(searchPage, null), role: 'search', class: 'space-y-2' }, [
+    ui.label({ for: 'produce-search', class: 'block text-base font-medium text-ink' }, ['查挑選技巧（不限當季）']),
     ui.div({ class: 'flex gap-2' }, [
       ui.input({
         id: 'produce-search',
@@ -283,24 +352,15 @@ const searchForm = part((month: number | null, q: string | null, show: ShowValue
         [searchIcon(), '搜尋'],
       ),
     ]),
-    q !== null &&
-      q !== '' &&
-      ui.a(
-        {
-          href: ui.link(home, null, { month, show }),
-          class: 'inline-flex min-h-11 items-center text-sm text-brand-strong underline underline-offset-4',
-        },
-        ['清除搜尋'],
-      ),
   ]),
 )
 
 /** 篩選欄: plain links like the month chips, so the filter is in the URL and needs no JavaScript. */
-const filterChip = part((option: z.infer<typeof ShowOption>, month: number | null, q: string | null) =>
+const filterChip = part((option: z.infer<typeof ShowOption>, month: number | null) =>
   ui.li({}, [
     ui.a(
       {
-        href: ui.link(home, null, { month, q, show: option.value }),
+        href: ui.link(home, null, { month, show: option.value }),
         'aria-current': option.isSelected,
         class:
           'inline-flex min-h-11 items-center justify-center rounded-full border px-4 text-base font-medium transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
@@ -314,11 +374,11 @@ const filterChip = part((option: z.infer<typeof ShowOption>, month: number | nul
   ]),
 )
 
-const filterBar = part((today: TodayData, month: number | null, q: string | null) =>
+const filterBar = part((today: TodayData, month: number | null) =>
   ui.nav({ 'aria-label': '篩選條件', class: 'flex flex-wrap items-center gap-x-4 gap-y-2 rounded-3xl bg-surface px-5 py-4 shadow-sm' }, [
     ui.p({ class: 'text-base font-bold text-ink' }, ['篩選']),
     ui.ul({ class: 'flex flex-wrap gap-2' }, [
-      ui.each(today.showOptions, 'id', (option) => filterChip(option, month, q)),
+      ui.each(today.showOptions, 'id', (option) => filterChip(option, month)),
     ]),
     today.show === 'cheap' &&
       today.priceStatus !== 'ok' &&
@@ -326,44 +386,62 @@ const filterBar = part((today: TodayData, month: number | null, q: string | null
   ]),
 )
 
-// ---- Page ----
+// ---- Pages ----
+
+/** pt-32 / sm:pt-28 leave room for the fixed header (it wraps to two lines on phones). */
+const pageMain = 'mx-auto max-w-6xl px-4 pt-32 pb-10 sm:px-6 sm:pt-28 sm:pb-14'
+
+const footerNote = part(() =>
+  ui.p({ class: 'border-t border-line pt-6 text-sm text-ink-muted' }, [
+    '產季為一般年份的參考，實際價格會受天候（如颱風）影響。價格資料來源：農業部「農產品交易行情」開放資料。',
+  ]),
+)
+
+const unavailable = part((message: string) =>
+  ui.p({ role: 'alert', class: 'rounded-3xl bg-surface p-6 text-base text-ink' }, [message]),
+)
 
 export const Home = ui.view({
   route: home,
   render: ({ search }) =>
-    ui.main({ class: 'mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14' }, [
+    ui.main({ class: pageMain }, [
       ui.query(getToday, { month: search.month, show: search.show }, {
         ready: (today) =>
           ui.div({ class: 'space-y-12' }, [
-            ui.header({ class: 'space-y-6' }, [
-              ui.h1({ class: 'flex items-center gap-3 font-serif text-3xl font-bold text-brand-strong sm:text-4xl' }, [
-                sproutIcon(),
-                '台灣當季蔬果',
-              ]),
-              dateCard(today),
-              monthNav(today, search.q),
-              searchForm(search.month, search.q, search.show),
-            ]),
-            search.q !== null &&
-              search.q !== '' &&
-              ui.query(searchProduce, { q: search.q }, {
-                ready: (result) => searchSection(result),
-                failed: { Unexpected: () => ui.p({ role: 'alert', class: 'text-base text-ink' }, ['搜尋暫時無法使用，請稍後再試。']) },
-              }),
-            filterBar(today, search.month, search.q),
+            ui.header({ class: 'space-y-6' }, [siteHeader('home'), dateCard(today), monthNav(today), searchForm(null)]),
+            filterBar(today, search.month),
             picksSection(today),
             listSection('當季蔬菜', '本月盛產的時令蔬菜', `${today.monthLabel}・共 ${today.vegetables.length} 項`, today.vegetables),
             listSection('當季水果', '本月盛產的時令水果', `${today.monthLabel}・共 ${today.fruits.length} 項`, today.fruits),
-            ui.p({ class: 'border-t border-line pt-6 text-sm text-ink-muted' }, [
-              '產季為一般年份的參考，實際價格會受天候（如颱風）影響。價格資料來源：農業部「農產品交易行情」開放資料。',
-            ]),
+            footerNote(),
           ]),
-        failed: {
-          Unexpected: () =>
-            ui.p({ role: 'alert', class: 'rounded-3xl bg-surface p-6 text-base text-ink' }, [
-              '暫時無法取得當季資料，請稍後再試。',
-            ]),
-        },
+        failed: { Unexpected: () => unavailable('暫時無法取得當季資料，請稍後再試。') },
       }),
+    ]),
+})
+
+export const SearchPage = ui.view({
+  route: searchPage,
+  render: ({ search }) =>
+    ui.main({ class: `${pageMain} space-y-12` }, [
+      ui.header({ class: 'space-y-6' }, [siteHeader('search'), searchForm(search.q)]),
+      ui.query(searchProduce, { q: search.q ?? '' }, {
+        ready: (result) => searchResults(result),
+        failed: { Unexpected: () => unavailable('搜尋暫時無法使用，請稍後再試。') },
+      }),
+      footerNote(),
+    ]),
+})
+
+export const FavoritesPage = ui.view({
+  route: favoritesPage,
+  render: () =>
+    ui.main({ class: `${pageMain} space-y-12` }, [
+      ui.header({}, [siteHeader('favorites')]),
+      ui.query(listCatalog, {}, {
+        ready: (cards) => favoritesSection(cards),
+        failed: { Unexpected: () => unavailable('暫時無法載入蔬果資料，請稍後再試。') },
+      }),
+      footerNote(),
     ]),
 })

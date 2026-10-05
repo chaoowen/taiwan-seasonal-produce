@@ -42,7 +42,6 @@ export const MonthOption = z.object({
 })
 
 export const Today = z.object({
-  // dateLabel: z.string(),
   yearLabel: z.string(),
   dayLabel: z.string(),
   weekdayLabel: z.string(),
@@ -63,10 +62,7 @@ export const Today = z.object({
 
 // The date decides the list, so every request reads it fresh (in Asia/Taipei time).
 export const getToday = query({
-  // input: z.object({}),
-  // input: z.object({ month: z.number().int().min(1).max(12).nullable() }),
   /** `month: null` (or anything outside 1–12, e.g. a hand-edited URL) means the current month in Taiwan. */
-  // input: z.object({ month: z.number().nullable() }),
   input: z.object({ month: z.number().nullable(), show: Show }),
   output: Today,
   scope: 'public',
@@ -91,6 +87,15 @@ export const ProduceSearch = z.object({
 export const searchProduce = query({
   input: z.object({ q: z.string() }),
   output: ProduceSearch,
+  scope: 'public',
+  freshness: 'request',
+  runs: 'server',
+})
+
+/** Every catalog item as a card; the favourites page shows the visitor's saved ones. */
+export const listCatalog = query({
+  input: z.object({}),
+  output: z.array(SearchResult),
   scope: 'public',
   freshness: 'request',
   runs: 'server',
