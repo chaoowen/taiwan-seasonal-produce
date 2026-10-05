@@ -1,0 +1,15 @@
+{
+  // Cloudflare Workers config. Build first: npm run build:worker
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "taiwan-seasonal-produce",
+  "main": "dist/worker/index.js",
+  "compatibility_date": "2026-10-01",
+  // Hozu and the MOA client import node: built-ins.
+  "compatibility_flags": ["nodejs_compat"],
+  // Already bundled by scripts/build-worker.ts (with the Hozu esbuild plugin).
+  "no_bundle": true,
+  "find_additional_modules": false,
+  // Hashed CSS, fonts, images and JS from `hozu build`, served at /_hozu/… before the Worker runs.
+  "assets": { "directory": "dist/public" },
+  "observability": { "enabled": true }
+}

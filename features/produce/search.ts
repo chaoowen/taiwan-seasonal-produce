@@ -1,5 +1,6 @@
 import { CATALOG, type CatalogItem } from './catalog.ts'
-import { getPriceSummary, type ItemPrice } from './market.ts'
+import type { ItemPrice } from './market.ts'
+import { getPriceSummary } from './prices.ts'
 import { MARKET_NAMES } from './market-names.ts'
 import { toProduce } from './season.ts'
 import { getTaipeiDate } from './taipei-date.ts'

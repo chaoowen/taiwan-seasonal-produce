@@ -1,5 +1,6 @@
 import { CATALOG, type CatalogItem } from './catalog.ts'
-import { getPriceSummary, type ItemPrice } from './market.ts'
+import type { ItemPrice } from './market.ts'
+import { getPriceSummary } from './prices.ts'
 import { getTaipeiDate } from './taipei-date.ts'
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
