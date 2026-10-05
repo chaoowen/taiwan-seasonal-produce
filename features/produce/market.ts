@@ -10,7 +10,7 @@ const SETTLED_AFTER_DAYS = 3
 /** Requests sent to the MOA API at the same time (keeps a cold start polite and quick). */
 const FETCH_CONCURRENCY = 6
 /** Past this, a cold fetch gives up so the page still renders (without prices). */
-export const PAGE_TIMEOUT_MS = 25_000
+const PAGE_TIMEOUT_MS = 25_000
 
 export interface ItemPrice {
   /** Volume-weighted wholesale average across markets on the item's latest trading day, NT$/kg. */

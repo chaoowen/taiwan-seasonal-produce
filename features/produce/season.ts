@@ -7,29 +7,6 @@ const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
 const SEASONS = ['冬季', '冬季', '春季', '春季', '春季', '夏季', '夏季', '夏季', '秋季', '秋季', '秋季', '冬季']
 const SEASON_STAGES = ['仲冬', '晚冬', '初春', '仲春', '晚春', '初夏', '仲夏', '晚夏', '初秋', '仲秋', '晚秋', '初冬']
 
-// getTaipeiDate moved to taipei-date.ts (shared with market.ts).
-// interface TaipeiDate {
-//   year: number
-//   month: number
-//   day: number
-//   weekday: number
-// }
-//
-// /** Today's calendar date in Taiwan, whatever time zone the server runs in. */
-// function getTaipeiDate(now: Date): TaipeiDate {
-//   const parts = new Intl.DateTimeFormat('en-US', {
-//     timeZone: TIME_ZONE, year: 'numeric', month: 'numeric', day: 'numeric', weekday: 'short',
-//   }).formatToParts(now)
-//   const pick = (type: string): string => parts.find((p) => p.type === type)?.value ?? ''
-//   const weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(pick('weekday'))
-//   return { year: Number(pick('year')), month: Number(pick('month')), day: Number(pick('day')), weekday }
-// }
-
-// ---- toProduce 串接行情前的版本 ----
-// function toProduce({ id, name, kind, origin, tip }: CatalogItem) {
-//   return { id, name, kind, origin, tip }
-// }
-
 /** Price at least this far below the 30-day baseline counts as a bargain (−10%). */
 const CHEAP_THRESHOLD = -0.1
 
@@ -122,7 +99,6 @@ export async function getSeasonalProduce(selectedMonth: number | null, show: Sho
   const inSeason = CATALOG.filter((item) => item.months.includes(month))
   const { status, summary } = await loadPrices(inSeason, month === currentMonth)
   const prices = summary?.prices ?? new Map<string, ItemPrice>()
-  // const produce = inSeason.map((item) => toProduce(item, month, prices.get(item.id) ?? null))
   const produce = inSeason
     .map((item) => toProduce(item, month, prices.get(item.id) ?? null))
     .filter((p) => matchesShow(p, show))
@@ -144,45 +120,3 @@ export async function getSeasonalProduce(selectedMonth: number | null, show: Sho
     fruits: produce.filter((p) => p.kind === 'fruit'),
   }
 }
-
-// ---- 串接行情前的版本（2026-10-05） ----
-// /**
-//  * Today's date in Taiwan, plus what is in season in the chosen month (default: this month)
-//  * and which items are at their peak there (recommended buys).
-//  */
-// export function getSeasonalProduce(selectedMonth: number | null, now: Date = new Date()) {
-//   const { year, month: currentMonth, day, weekday } = getTaipeiDate(now)
-//   const month = isValidMonth(selectedMonth) ? selectedMonth : currentMonth
-//   const inSeason = CATALOG.filter((item) => item.months.includes(month))
-//   return {
-//     yearLabel: `${year} 年`,
-//     dayLabel: `${currentMonth} 月 ${day} 日`,
-//     weekdayLabel: `星期${WEEKDAYS[weekday]}`,
-//     seasonLabel: getSeasonLabel(currentMonth),
-//     monthLabel: `${month} 月`,
-//     monthSeasonLabel: getSeasonLabel(month),
-//     isCurrentMonth: month === currentMonth,
-//     months: getMonthOptions(month, currentMonth),
-//     picks: inSeason.filter((item) => item.peak.includes(month)).map(toProduce),
-//     vegetables: inSeason.filter((item) => item.kind === 'vegetable').map(toProduce),
-//     fruits: inSeason.filter((item) => item.kind === 'fruit').map(toProduce),
-//   }
-// }
-
-// ---- 月份切換前的版本（2026-10-05） ----
-// /** What is in season on the given day, and which items are at their peak (recommended buys). */
-// export function getSeasonalProduce(now: Date = new Date()) {
-//   const { year, month, day, weekday } = getTaipeiDate(now)
-//   const inSeason = CATALOG.filter((item) => item.months.includes(month))
-//   return {
-//     // dateLabel: `${year} 年 ${month} 月 ${day} 日（星期${WEEKDAYS[weekday]}）`,
-//     yearLabel: `${year} 年`,
-//     dayLabel: `${month} 月 ${day} 日`,
-//     weekdayLabel: `星期${WEEKDAYS[weekday]}`,
-//     seasonLabel: `${SEASONS[month - 1]}・${SEASON_STAGES[month - 1]}`,
-//     monthLabel: `${month} 月`,
-//     picks: inSeason.filter((item) => item.peak.includes(month)).map(toProduce),
-//     vegetables: inSeason.filter((item) => item.kind === 'vegetable').map(toProduce),
-//     fruits: inSeason.filter((item) => item.kind === 'fruit').map(toProduce),
-//   }
-// }
