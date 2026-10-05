@@ -1,0 +1,44 @@
+# Deploys the site to Cloudflare Workers with a fresh wholesale price snapshot.
+# Needs repository secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID.
+name: Deploy to Cloudflare Workers
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # 22:00 UTC = 06:00 Asia/Taipei, after the MOA publishes the previous day's trades.
+    - cron: '0 22 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # Settled MOA days never change: keep them between runs so only the last few days are fetched.
+      - uses: actions/cache@v4
+        with:
+          path: .cache/moa
+          key: moa-${{ github.run_id }}
+          restore-keys: moa-
+
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build:worker
+
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy

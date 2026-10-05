@@ -6,3 +6,6 @@ dist
 
 # MOA wholesale price cache (features/produce/moa-client.ts)
 .cache/
+
+# Cloudflare Workers (wrangler local state)
+.wrangler/
