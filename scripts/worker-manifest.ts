@@ -11,7 +11,8 @@
  *   3. write dist/worker/manifest.json: the hozu build manifest with the Worker's irHash.
  */
 import { execFileSync } from 'node:child_process'
-import { copyFile, readFile, rm, writeFile } from 'node:fs/promises'
+import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { dirname } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 const BUNDLE = 'dist/worker/index.js'
@@ -29,6 +30,8 @@ interface WorkerIr {
 
 /** Before the first bundle: the Worker imports WORKER_MANIFEST, so start from hozu build's own. */
 export async function seedWorkerManifest(): Promise<void> {
+  // A clean checkout (CI) has no dist/worker yet.
+  await mkdir(dirname(WORKER_MANIFEST), { recursive: true })
   await copyFile('dist/manifest.json', WORKER_MANIFEST)
 }
 
