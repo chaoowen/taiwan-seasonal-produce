@@ -93,15 +93,22 @@ async function loadSummary(items: CatalogItem[], now: Date): Promise<PriceSummar
 }
 
 /**
- * Latest wholesale prices (農業部農產品交易行情) for the given items, with their change
- * against the previous 30 days. Settled days come from the disk cache, so only a cold
- * start calls the API for the whole window.
+ * Latest wholesale prices (農業部農產品交易行情) for the given items, computed live from the
+ * MOA API, with their change against the previous 30 days. Settled days come from the disk
+ * cache, so only a cold start calls the API for the whole window.
+ *
+ * Callers normally go through `getPriceSummary` in prices.ts, which memoises this or reads a snapshot.
  *
  * @throws When the API is unreachable and nothing is cached, or the cold fetch exceeds 25 s.
  */
-export async function getPriceSummary(items: CatalogItem[], now: Date = new Date()): Promise<PriceSummary> {
-  const timeout = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error('MOA price fetch timed out')), OVERALL_TIMEOUT_MS).unref(),
-  )
-  return Promise.race([loadSummary(items, now), timeout])
+export async function computeLivePriceSummary(items: CatalogItem[], now: Date = new Date()): Promise<PriceSummary> {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error('MOA price fetch timed out')), OVERALL_TIMEOUT_MS)
+  })
+  try {
+    return await Promise.race([loadSummary(items, now), timeout])
+  } finally {
+    clearTimeout(timer)
+  }
 }
