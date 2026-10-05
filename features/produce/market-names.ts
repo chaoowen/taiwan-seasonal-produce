@@ -6,7 +6,7 @@
  * and `exclude` drops varieties whose name contains one of the words (processed or ornamental).
  * Items whose crop is not traded in a given window simply get no price.
  */
-export interface MarketNameRule {
+interface MarketNameRule {
   patterns: string[]
   exclude?: string[]
 }
