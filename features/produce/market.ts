@@ -10,7 +10,7 @@ const SETTLED_AFTER_DAYS = 3
 /** Requests sent to the MOA API at the same time (keeps a cold start polite and quick). */
 const FETCH_CONCURRENCY = 6
 /** Past this, a cold fetch gives up so the page still renders (without prices). */
-const OVERALL_TIMEOUT_MS = 25_000
+export const PAGE_TIMEOUT_MS = 25_000
 
 export interface ItemPrice {
   /** Volume-weighted wholesale average across markets on the item's latest trading day, NT$/kg. */
@@ -99,12 +99,17 @@ async function loadSummary(items: CatalogItem[], now: Date): Promise<PriceSummar
  *
  * Callers normally go through `getPriceSummary` in prices.ts, which memoises this or reads a snapshot.
  *
- * @throws When the API is unreachable and nothing is cached, or the cold fetch exceeds 25 s.
+ * @param timeoutMs Gives up after this long: 25 s for page requests; the deploy snapshot allows longer.
+ * @throws When the API is unreachable and nothing is cached, or the fetch exceeds `timeoutMs`.
  */
-export async function computeLivePriceSummary(items: CatalogItem[], now: Date = new Date()): Promise<PriceSummary> {
+export async function computeLivePriceSummary(
+  items: CatalogItem[],
+  now: Date = new Date(),
+  timeoutMs: number = PAGE_TIMEOUT_MS,
+): Promise<PriceSummary> {
   let timer: ReturnType<typeof setTimeout> | undefined
   const timeout = new Promise<never>((_, reject) => {
-    timer = setTimeout(() => reject(new Error('MOA price fetch timed out')), OVERALL_TIMEOUT_MS)
+    timer = setTimeout(() => reject(new Error(`MOA price fetch timed out after ${timeoutMs / 1000} s`)), timeoutMs)
   })
   try {
     return await Promise.race([loadSummary(items, now), timeout])

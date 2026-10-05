@@ -11,11 +11,16 @@ import { computeLivePriceSummary } from '../features/produce/market.ts'
 import { toPriceSnapshot, type PriceSnapshot } from '../features/produce/prices.ts'
 
 const OUT_FILE = process.argv[2] ?? '.cache/price-snapshot.json'
+/**
+ * Far longer than a page request may wait: in CI (GitHub runners are in the US) a cold cache
+ * means ~60 MOA requests across the Pacific, which overran the 25 s page limit on the first deploy.
+ */
+const SNAPSHOT_TIMEOUT_MS = 5 * 60 * 1000
 
 /** A failed MOA fetch must not block a deploy: write a snapshot that says "no prices" instead. */
 async function createSnapshot(): Promise<PriceSnapshot> {
   try {
-    return toPriceSnapshot(await computeLivePriceSummary(CATALOG))
+    return toPriceSnapshot(await computeLivePriceSummary(CATALOG, new Date(), SNAPSHOT_TIMEOUT_MS))
   } catch (error) {
     console.warn('price snapshot: MOA API failed, deploying without prices:', error)
     return { generatedAt: new Date().toISOString(), tradeDateLabel: null }
