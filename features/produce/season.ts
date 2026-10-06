@@ -34,10 +34,28 @@ export function toProduce(item: CatalogItem, month: number, price: ItemPrice | n
 
 type Produce = ReturnType<typeof toProduce>
 
-/** Bargains first (biggest drop first), then the remaining peak-season items in catalog order. */
-function byBargain(a: Produce, b: Produce, prices: Map<string, ItemPrice>): number {
-  const drop = (p: Produce): number => (p.isCheap ? (prices.get(p.id)?.changePct ?? 0) : 0)
-  return drop(a) - drop(b)
+/** Recommended buys shown up front; the rest sit under 看更多. */
+const TOP_PICKS = 8
+/** Peak season counts like a 15% price drop: in season beats barely cheap. */
+const PEAK_SCORE = 0.15
+
+/** How strongly to recommend: the price drop (when cheap) plus a bonus for peak season. */
+function pickScore(p: Produce, prices: Map<string, ItemPrice>): number {
+  const drop = p.isCheap ? -(prices.get(p.id)?.changePct ?? 0) : 0
+  return drop + (p.isPeak ? PEAK_SCORE : 0)
+}
+
+/**
+ * Best first, split into top and more. Ties (e.g. every item in a month without prices) alternate
+ * vegetables and fruits, so the catalog order (vegetables first) doesn't push all fruit under 看更多.
+ */
+function splitPicks(candidates: Produce[], prices: Map<string, ItemPrice>) {
+  const kindCounts = { vegetable: 0, fruit: 0 }
+  const ranked = candidates
+    .map((p) => ({ p, score: pickScore(p, prices), turn: kindCounts[p.kind]++ }))
+    .sort((a, b) => b.score - a.score || a.turn - b.turn || (a.p.kind === 'vegetable' ? -1 : 1))
+    .map(({ p }) => p)
+  return { picks: ranked.slice(0, TOP_PICKS), morePicks: ranked.slice(TOP_PICKS) }
 }
 
 /** Prices for the current month only; an API failure leaves the page usable without them. */
@@ -115,7 +133,7 @@ export async function getSeasonalProduce(selectedMonth: number | null, show: Sho
     showOptions: getShowOptions(show),
     priceStatus: status,
     priceDateLabel: summary?.tradeDateLabel ?? null,
-    picks: produce.filter((p) => p.isPeak || p.isCheap).sort((a, b) => byBargain(a, b, prices)),
+    ...splitPicks(produce.filter((p) => p.isPeak || p.isCheap), prices),
     vegetables: produce.filter((p) => p.kind === 'vegetable'),
     fruits: produce.filter((p) => p.kind === 'fruit'),
   }
