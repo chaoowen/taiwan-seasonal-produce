@@ -14,7 +14,9 @@
     "fonts": "node scripts/subset-fonts.ts",
     "sync:catalog": "node scripts/sync-catalog.ts",
     "photos": "node scripts/fetch-photos.ts",
-    "share-image": "node scripts/make-share-image.ts"
+    "share-image": "node scripts/make-share-image.ts",
+    "sync:volume": "node scripts/sync-volume.ts",
+    "compare:peaks": "node scripts/compare-peaks.ts"
   },
   "dependencies": {
     "@hozu/adapter-node": "^0.17.1",
