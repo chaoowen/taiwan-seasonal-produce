@@ -1,0 +1,49 @@
+# Every 3 hours, a synthetic check of the live site's key pages (status, real content, response time).
+# Opens an issue when something fails (or comments on the open one) and closes it once all pass again.
+name: Pages watch
+
+on:
+  schedule:
+    - cron: '17 */3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  SITE_URL: https://taiwan-seasonal-produce.chaoowen88.workers.dev
+  ISSUE_TITLE: '網站頁面異常（自動偵測）'
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Check pages
+        id: check
+        run: |
+          set +e
+          node scripts/check-pages.ts "$SITE_URL" > report.md
+          echo "failed=$([ $? -ne 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          cat report.md
+
+      - name: Open, update or close the issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FAILED: ${{ steps.check.outputs.failed }}
+        run: |
+          open=$(gh issue list --state open --search "in:title \"$ISSUE_TITLE\"" --json number --jq '.[0].number // empty')
+          if [ "$FAILED" = "true" ]; then
+            if [ -n "$open" ]; then gh issue comment "$open" --body-file report.md
+            else gh issue create --title "$ISSUE_TITLE" --body-file report.md; fi
+            exit 1
+          elif [ -n "$open" ]; then
+            gh issue close "$open" --comment "$(cat report.md)"
+          fi

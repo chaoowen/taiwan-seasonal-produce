@@ -97,6 +97,7 @@ scripts/
   subset-fonts.ts     產生只含網站用字的 Noto TC 字型（見下方「字型」）
   make-share-image.ts 產生每日分享圖卡（headless Chrome＋sharp）
   check-price-freshness.ts  檢查線上價格是否過期（每日 workflow 使用）
+  check-pages.ts      檢查線上重要頁面（每 3 小時 workflow 使用）
   price-snapshot.ts   產生價格快照（農業部失敗時寫入「無價格」快照，不擋部署）
   build-worker.ts     以 esbuild＋Hozu 外掛打包 Worker
   worker-manifest.ts  校正 Worker 的建置紀錄雜湊（見下方「Hozu 元件與 Workers」）
@@ -104,6 +105,7 @@ wrangler.jsonc     Cloudflare 設定
 .github/workflows/deploy.yml        自動部署
 .github/workflows/sync-catalog.yml  每週同步開放資料，有變動就開 PR
 .github/workflows/price-watch.yml   每日檢查價格是否過期，過期就開 issue、恢復就關閉
+.github/workflows/pages-watch.yml   每 3 小時檢查重要頁面（狀態碼、內容、回應時間），異常就開 issue、恢復就關閉
 hozu.lock.json     Hozu 記錄的端點與轉換（`hozu check --update-lock` 更新）
 ```
 
@@ -152,6 +154,7 @@ flowchart LR
 - **頁面快取**：公開查詢使用 `freshness: { revalidate: 300 }`，頁面在伺服器端快取 5 分鐘（`x-hozu-cache` 標示命中與否；瀏覽器端 `max-age=0, must-revalidate`，不會看到過期頁面）。價格只隨部署更新；午夜換日後最多 5 分鐘仍顯示前一天。實測重複請求：搜尋頁 17.6 → 1.8 ms。
 - **免費方案即可**：價格事先算好，每次請求在 workerd 實測平均約 1.2 ms（免費方案上限 10 ms CPU）。
 - **自動部署**：`.github/workflows/deploy.yml` 在 push 到 `main`、每天 06:00 與 09:00（台灣時間；09:00 為備援，GitHub 排程可能延遲或略過）與手動觸發時部署。
+- **頁面監控**：`pages-watch.yml` 每 3 小時檢查首頁、搜尋、收藏、品項頁、`/api/status`、sitemap、robots 回應 200（不存在的品項回應 404）、首頁確實有「當月建議購買」、回應不超過 5 秒；異常時開 issue「網站頁面異常（自動偵測）」，恢復自動關閉。Cloudflare 端的錯誤（例如 1102 超出資源限制）可在後台 Workers → Metrics 查看；若要自動讀取，需替 API Token 加上 Account Analytics 讀取權限。
 - **價格過期提醒**：`price-watch.yml` 每天 12:00 讀取 `/api/status`；快照超過 48 小時、沒有價格、或最近交易日超過 4 天時，自動開 issue「價格資料過期（自動偵測）」（已開則留言），恢復後自動關閉。需要在 GitHub repo 設定兩個 secrets：
   - `CLOUDFLARE_API_TOKEN`：Cloudflare 後台 → My Profile → API Tokens → 用「Edit Cloudflare Workers」範本建立
   - `CLOUDFLARE_ACCOUNT_ID`：Cloudflare 後台 Workers 頁面右側
