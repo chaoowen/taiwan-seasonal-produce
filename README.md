@@ -198,7 +198,7 @@ Noto Sans TC（內文）與 Noto Serif TC（標題）使用**子集字型**：`s
 | 農糧署每月盛產農產品產地 | [政府資料開放授權條款](https://data.gov.tw/license) |
 | Noto Sans TC／Noto Serif TC（子集，來源 Google Fonts） | SIL Open Font License 1.1 |
 | Lucide 圖示 | ISC |
-| 背景圖 `assets/linen.jpg` | 專案擁有者已取得使用授權 |
+| 背景圖 `assets/linen.webp` | 專案擁有者已取得使用授權 |
 
 ## 已知限制
 

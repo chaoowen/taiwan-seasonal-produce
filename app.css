@@ -117,8 +117,8 @@ body {
 
 body {
   background-color: var(--color-canvas);
-  /* Linen texture (assets/linen.jpg), tiled; the canvas colour shows while it loads. */
-  background-image: url('./assets/linen.jpg');
+  /* Linen texture (assets/linen.webp), tiled; the canvas colour shows while it loads. */
+  background-image: url('./assets/linen.webp');
   background-size: 480px auto;
   color: var(--color-ink);
   font-family: var(--font-sans);
