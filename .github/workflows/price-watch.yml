@@ -1,0 +1,50 @@
+# Daily check that the live site serves fresh wholesale prices (GET /api/status). Opens an issue when they
+# are stale (or comments on the open one), and closes it once prices are fresh again.
+name: Price freshness watch
+
+on:
+  schedule:
+    # 04:00 UTC = 12:00 Asia/Taipei, after both daily deploy slots.
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  SITE_URL: https://taiwan-seasonal-produce.chaoowen88.workers.dev
+  ISSUE_TITLE: '價格資料過期（自動偵測）'
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Check freshness
+        id: check
+        run: |
+          set +e
+          node scripts/check-price-freshness.ts "$SITE_URL" > report.md
+          echo "stale=$([ $? -ne 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          cat report.md
+
+      - name: Open, update or close the issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STALE: ${{ steps.check.outputs.stale }}
+        run: |
+          open=$(gh issue list --state open --search "in:title \"$ISSUE_TITLE\"" --json number --jq '.[0].number // empty')
+          if [ "$STALE" = "true" ]; then
+            if [ -n "$open" ]; then gh issue comment "$open" --body-file report.md
+            else gh issue create --title "$ISSUE_TITLE" --body-file report.md; fi
+            exit 1
+          elif [ -n "$open" ]; then
+            gh issue close "$open" --comment "$(cat report.md)"
+          fi

@@ -27,6 +27,13 @@ export function getRocDate(now: Date, daysAgo: number): string {
   return `${year - ROC_YEAR_OFFSET}.${pad(month)}.${pad(day)}`
 }
 
+/** "115.10.02" → "2026-10-02". */
+export function rocToIsoDate(rocDate: string): string {
+  const [year = 0, month = 0, day = 0] = rocDate.split('.').map(Number)
+  const pad = (n: number): string => String(n).padStart(2, '0')
+  return `${year + ROC_YEAR_OFFSET}-${pad(month)}-${pad(day)}`
+}
+
 /** "115.10.02" → "10/2". */
 export function formatRocDate(rocDate: string): string {
   const [, month, day] = rocDate.split('.').map(Number)

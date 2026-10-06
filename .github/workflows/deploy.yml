@@ -8,6 +8,8 @@ on:
   schedule:
     # 22:00 UTC = 06:00 Asia/Taipei, after the MOA publishes the previous day's trades.
     - cron: '0 22 * * *'
+    # 01:00 UTC = 09:00 Asia/Taipei: backup slot (GitHub may delay or skip scheduled runs).
+    - cron: '0 1 * * *'
   workflow_dispatch:
 
 concurrency:

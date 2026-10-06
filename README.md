@@ -10,6 +10,7 @@
 | 搜尋 | `/search?q=草莓` | 搜尋全部 77 種蔬果（不限當季），可用官方品名，例如「甘藍」找到高麗菜、「結球白菜」找到大白菜 |
 | 我的收藏 | `/favorites` | 收藏的蔬果（不限當季），存在瀏覽器的 localStorage |
 | 範本首頁 | `/demo` | `create-hozu` 產生的範本，保留對照用 |
+| 狀態 API | `/api/status` | JSON：價格來源、快照產生時間、最近交易日（供每日檢查使用） |
 
 | 首頁功能 | 說明 | 網址參數 |
 | -------- | ---- | -------- |
@@ -82,12 +83,15 @@ worker/
 scripts/
   sync-catalog.ts     下載並整理農糧署「每月盛產農產品產地」
   subset-fonts.ts     產生只含網站用字的 Noto TC 字型（見下方「字型」）
+  check-price-freshness.ts  檢查線上價格是否過期（每日 workflow 使用）
   price-snapshot.ts   產生價格快照（農業部失敗時寫入「無價格」快照，不擋部署）
   build-worker.ts     以 esbuild＋Hozu 外掛打包 Worker
   worker-manifest.ts  校正 Worker 的建置紀錄雜湊（見下方「Hozu 元件與 Workers」）
 wrangler.jsonc     Cloudflare 設定
 .github/workflows/deploy.yml        自動部署
 .github/workflows/sync-catalog.yml  每週同步開放資料，有變動就開 PR
+.github/workflows/price-watch.yml   每日檢查價格是否過期，過期就開 issue、恢復就關閉
+hozu.lock.json     Hozu 記錄的端點與轉換（`hozu check --update-lock` 更新）
 ```
 
 ## 資料來源與推薦邏輯
@@ -133,7 +137,8 @@ flowchart LR
 ```
 
 - **免費方案即可**：價格事先算好，每次請求在 workerd 實測平均約 1.2 ms（免費方案上限 10 ms CPU）。
-- **自動部署**：`.github/workflows/deploy.yml` 在 push 到 `main`、每天 06:00（台灣時間）與手動觸發時部署。需要在 GitHub repo 設定兩個 secrets：
+- **自動部署**：`.github/workflows/deploy.yml` 在 push 到 `main`、每天 06:00 與 09:00（台灣時間；09:00 為備援，GitHub 排程可能延遲或略過）與手動觸發時部署。
+- **價格過期提醒**：`price-watch.yml` 每天 12:00 讀取 `/api/status`；快照超過 48 小時、沒有價格、或最近交易日超過 4 天時，自動開 issue「價格資料過期（自動偵測）」（已開則留言），恢復後自動關閉。需要在 GitHub repo 設定兩個 secrets：
   - `CLOUDFLARE_API_TOKEN`：Cloudflare 後台 → My Profile → API Tokens → 用「Edit Cloudflare Workers」範本建立
   - `CLOUDFLARE_ACCOUNT_ID`：Cloudflare 後台 Workers 頁面右側
 - **手動部署**：`npx wrangler login` 後執行 `npm run deploy`。

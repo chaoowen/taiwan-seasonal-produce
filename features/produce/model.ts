@@ -1,4 +1,4 @@
-import { query } from '@hozu/core'
+import { endpoint, query } from '@hozu/core'
 import { z } from 'zod'
 
 export const Kind = z.enum(['vegetable', 'fruit'])
@@ -100,4 +100,18 @@ export const listCatalog = query({
   scope: 'public',
   freshness: 'request',
   runs: 'server',
+})
+
+/** GET /api/status: how fresh the served prices are (read by the daily freshness workflow). */
+export const getStatus = endpoint({
+  method: 'GET',
+  path: '/api/status',
+  input: z.object({}),
+  output: z.object({
+    prices: z.object({
+      source: z.enum(['snapshot', 'live']),
+      generatedAt: z.string().nullable(),
+      tradeDate: z.string().nullable(),
+    }),
+  }),
 })

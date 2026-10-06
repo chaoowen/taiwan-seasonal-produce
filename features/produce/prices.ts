@@ -9,19 +9,30 @@ const LIVE_TTL_MS = 60 * 60 * 1000
  * into the Cloudflare Worker, so serving a page never calls the MOA API.
  */
 export type PriceSnapshot =
-  | { generatedAt: string; tradeDateLabel: string; prices: Record<string, ItemPrice> }
+  | { generatedAt: string; tradeDateLabel: string; tradeDate: string; prices: Record<string, ItemPrice> }
   /** The MOA API failed at deploy time: the site shows "prices unavailable" instead of stale numbers. */
   | { generatedAt: string; tradeDateLabel: null }
 
+/** Where prices come from and how fresh they are: what /api/status reports and the freshness check reads. */
+export interface PriceSourceStatus {
+  source: 'snapshot' | 'live'
+  /** When the snapshot was built, or the live summary computed; null if it never succeeded. */
+  generatedAt: string | null
+  /** Latest MOA trading day in the data (ISO date); null when there are no prices. */
+  tradeDate: string | null
+}
+
 /** `undefined`: no snapshot (live mode); `null`: a snapshot without prices. */
 let snapshot: PriceSummary | null | undefined
+let snapshotGeneratedAt: string | null = null
 let live: { summary: Promise<PriceSummary>; computedAt: number } | null = null
 
 /** Serve prices from a snapshot from now on (called once by the Worker entry). */
 export function usePriceSnapshot(data: PriceSnapshot): void {
+  snapshotGeneratedAt = data.generatedAt
   snapshot = data.tradeDateLabel === null
     ? null
-    : { tradeDateLabel: data.tradeDateLabel, prices: new Map(Object.entries(data.prices)) }
+    : { tradeDateLabel: data.tradeDateLabel, tradeDate: data.tradeDate, prices: new Map(Object.entries(data.prices)) }
 }
 
 /** The live whole-catalog summary, shared by concurrent requests and reused for an hour. */
@@ -51,7 +62,7 @@ export async function getPriceSummary(items: CatalogItem[]): Promise<PriceSummar
       return price ? [[item.id, price] as const] : []
     }),
   )
-  return { tradeDateLabel: summary.tradeDateLabel, prices }
+  return { tradeDateLabel: summary.tradeDateLabel, tradeDate: summary.tradeDate, prices }
 }
 
 /** Serialises a summary for `usePriceSnapshot`. */
@@ -59,6 +70,20 @@ export function toPriceSnapshot(summary: PriceSummary, now: Date = new Date()): 
   return {
     generatedAt: now.toISOString(),
     tradeDateLabel: summary.tradeDateLabel,
+    tradeDate: summary.tradeDate,
     prices: Object.fromEntries(summary.prices),
+  }
+}
+
+/** Freshness of the prices this instance serves (never throws: failures read as nulls). */
+export async function getPriceSourceStatus(): Promise<PriceSourceStatus> {
+  if (snapshot !== undefined) {
+    return { source: 'snapshot', generatedAt: snapshotGeneratedAt, tradeDate: snapshot?.tradeDate ?? null }
+  }
+  try {
+    const summary = await getLiveSummary()
+    return { source: 'live', generatedAt: new Date(live?.computedAt ?? Date.now()).toISOString(), tradeDate: summary.tradeDate }
+  } catch {
+    return { source: 'live', generatedAt: null, tradeDate: null }
   }
 }
