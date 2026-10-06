@@ -33,6 +33,12 @@ jobs:
           key: moa-${{ github.run_id }}
           restore-keys: moa-
 
+      # Full Noto TC fonts (~28 MB) that scripts/subset-fonts.ts cuts down to the site's characters.
+      - uses: actions/cache@v4
+        with:
+          path: .cache/fonts
+          key: fonts-noto-tc-v1
+
       - run: npm ci
       - run: npm run check
       - run: npm run build:worker

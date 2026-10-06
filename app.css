@@ -1,20 +1,32 @@
 /*
- * Chinese web fonts, self-hosted (Fontsource) so the strict CSP needs no external sources.
- * Google Fonts via @import url() is dropped: Hozu puts its own rules first, and @import must come first.
- * @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap');
+ * Noto Sans TC / Noto Serif TC (OFL), subset to the characters this site shows by scripts/subset-fonts.ts.
+ * Hozu preloads every local font file, so the full unicode-range split (~200 files, ~15 MB) is not an option.
+ * Characters outside the subset (e.g. a rare one typed into search) fall back to the system fonts below.
  */
-@import "@fontsource-variable/noto-sans-tc";
-@import "@fontsource-variable/noto-serif-tc";
+@font-face {
+  font-family: 'Noto Sans TC Subset';
+  src: url('./assets/fonts/noto-sans-tc.woff2') format('woff2');
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noto Serif TC Subset';
+  src: url('./assets/fonts/noto-serif-tc.woff2') format('woff2');
+  font-weight: 400 700;
+  font-display: swap;
+}
+
 @import "tailwindcss";
 
 /*
  * Semantic colour tokens: coffee browns on a cream linen texture, Morandi slate blue as the accent
- * ("brand"), caramel for fruit and highlights ("accent"). No black. One palette for every colour scheme (2026-10-05: dark mode dropped on request).
+ * ("brand"), caramel for fruit and highlights ("accent"). No black; one palette for every colour scheme.
  * Text tokens are the darker shades so every pair meets WCAG AA 4.5:1.
  */
 @theme {
-  --font-sans: 'Noto Sans TC Variable', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
-  --font-serif: 'Noto Serif TC Variable', 'Songti TC', 'PMingLiU', serif;
+  --font-sans: 'Noto Sans TC Subset', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
+  --font-serif: 'Noto Serif TC Subset', 'Songti TC', 'PMingLiU', serif;
 
   --color-canvas: #ede6da;
   /* Slightly translucent so the linen shows through the cards. */
