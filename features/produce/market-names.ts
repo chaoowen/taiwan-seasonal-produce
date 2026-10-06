@@ -42,6 +42,16 @@ export const MARKET_NAMES: Record<string, MarketNameRule> = {
   taro: { patterns: ['芋-檳榔心芋', '芋-麵芋', '芋-里芋'] },
   'water-caltrop': { patterns: ['菱角'] },
   'sweet-corn': { patterns: ['玉米-甜硬殼', '玉米-甜軟殼', '玉米-超甜白'] },
+  'makino-bamboo': { patterns: ['桶筍-桂竹筍', '熟筍-桂竹筍'] },
+  edamame: { patterns: ['毛豆'] },
+  'bell-pepper': { patterns: ['甜椒'] },
+  'arrow-bamboo': { patterns: ['桶筍-箭竹筍', '熟筍-箭竹筍'] },
+  lettuce: { patterns: ['萵苣菜-結球萵'] },
+  cucumber: { patterns: ['胡瓜'] },
+  chili: { patterns: ['辣椒'] },
+  'yardlong-bean': { patterns: ['菜豆'] },
+  'ma-bamboo': { patterns: ['竹筍-麻竹筍', '桶筍-麻竹筍'] },
+  // No single market price: mushrooms (many kinds) and daylily (金針筍 is a different crop).
 
   // Fruits (TcType N05)
   orange: { patterns: ['甜橙-柳橙'] },
@@ -74,6 +84,12 @@ export const MARKET_NAMES: Record<string, MarketNameRule> = {
   banana: { patterns: ['香蕉'] },
   guava: { patterns: ['番石榴'] },
   papaya: { patterns: ['木瓜'], exclude: ['青木瓜'] },
+  coconut: { patterns: ['椰子'] },
+  melon: { patterns: ['甜瓜', '洋香瓜'] },
+  grapefruit: { patterns: ['葡萄柚'] },
+  apple: { patterns: ['蘋果'] },
+  kumquat: { patterns: ['雜柑-金棗'] },
+  // No domestic market price: 水蜜桃 and 甜蜜桃 trade only as imports (進口) in the MOA data.
 }
 
 /** Whether a MOA crop name (e.g. "甘藍-初秋") belongs to the item described by `rule`. */

@@ -3,7 +3,7 @@ const DAY_MS = 24 * 60 * 60 * 1000
 /** ROC (民國) year = Gregorian year − 1911; the MOA API uses it for dates. */
 const ROC_YEAR_OFFSET = 1911
 
-export interface TaipeiDate {
+interface TaipeiDate {
   year: number
   month: number
   day: number

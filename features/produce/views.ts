@@ -97,7 +97,7 @@ const pickCard = part((item: Item) =>
         ui.span({ class: 'text-base font-bold text-ink tabular-nums' }, ['批發價 ', item.priceLabel]),
         changeText(item),
       ]),
-    tipBox(item.tip),
+    item.tip !== null && tipBox(item.tip),
   ]),
 )
 
@@ -134,7 +134,7 @@ const catalogCard = part((item: CatalogCard, isHidden: boolean) =>
         ui.span({ class: 'text-base font-bold text-ink tabular-nums' }, ['批發價 ', item.priceLabel]),
         changeText(item),
       ]),
-    tipBox(item.tip),
+    item.tip !== null && tipBox(item.tip),
   ]),
 )
 
@@ -393,7 +393,7 @@ const pageMain = 'mx-auto max-w-6xl px-4 pt-32 pb-10 sm:px-6 sm:pt-28 sm:pb-14'
 
 const footerNote = part(() =>
   ui.p({ class: 'border-t border-line pt-6 text-sm text-ink-muted' }, [
-    '產季為一般年份的參考，實際價格會受天候（如颱風）影響。價格資料來源：農業部「農產品交易行情」開放資料。',
+    '產季與產地：農業部農糧署「每月盛產農產品產地」開放資料（部分品項為人工整理）；價格：農業部「農產品交易行情」。實際價格會受天候（如颱風）影響。',
   ]),
 )
 
