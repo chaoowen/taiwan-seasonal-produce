@@ -8,12 +8,13 @@
     "start": "hozu serve",
     "build": "hozu build",
     "snapshot:prices": "node scripts/price-snapshot.ts",
-    "build:worker": "node scripts/subset-fonts.ts && hozu build && node scripts/price-snapshot.ts && node scripts/build-worker.ts",
+    "build:worker": "node scripts/subset-fonts.ts && node scripts/price-snapshot.ts && node scripts/make-share-image.ts && hozu build && node scripts/build-worker.ts",
     "preview:worker": "npm run build:worker && wrangler dev",
     "deploy": "npm run build:worker && wrangler deploy",
     "fonts": "node scripts/subset-fonts.ts",
     "sync:catalog": "node scripts/sync-catalog.ts",
-    "photos": "node scripts/fetch-photos.ts"
+    "photos": "node scripts/fetch-photos.ts",
+    "share-image": "node scripts/make-share-image.ts"
   },
   "dependencies": {
     "@hozu/adapter-node": "^0.17.1",

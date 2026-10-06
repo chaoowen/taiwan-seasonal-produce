@@ -138,7 +138,7 @@ export const ProduceDetail = z.object({
   /** Official names it is also known by (e.g. 甘藍 for 高麗菜). */
   aliases: z.array(z.string()),
   /** Wikimedia Commons attribution for the photo; null without one. */
-  photoCredit: z.object({ author: z.string(), license: z.string(), sourceUrl: z.string() }).nullable(),
+  photoCredit: z.object({ author: z.string(), license: z.string(), sourceUrl: z.string(), imageUrl: z.string() }).nullable(),
 })
 
 /** One item's page; NotFound for an unknown id (the page answers 404). */
