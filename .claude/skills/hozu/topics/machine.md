@@ -22,9 +22,16 @@ export const m = machine({
   `ctx.list = ctx.list.filter((i) => i.id !== e.id)`.
 - **guard** returns a condition: `on(Add, { target: 'adding', guard: (e) => e.title.length >= 2 })`; the first
   matching guard wins.
-- **invoke** runs a mutation on entry; the state drops events it does not handle. `failed` lists every declared error
+- **invoke** runs a mutation (or reads a query) on entry; the state drops events it does not handle. `failed` lists every declared error
   of the mutation plus `Unexpected` (`Invalid` optional, `hozu docs forms`).
-- Do not handle the busy event in the busy state: a transition to the same state re-runs its `invoke`.
+- An `on` without `target` stays: its timers keep running and an `invoke` keeps going. Naming the state enters it
+  again (timers restart, `invoke` re-runs): a debounce, or a timer that repeats.
+- `target: 'previous'` (or `done: 'previous'`) returns to the last state without `invoke`, so a busy state entered
+  from two modes (viewing, editing) needs no copy per mode.
+- **refresh** reads the page's queries with those tags again: `on(RefreshNow, { refresh: () => [quotesTag()] })`;
+  every 30 s while live: `live: { after: [{ ms: 30_000, target: 'live', refresh: () => [quotesTag()] }] }` (Pause is
+  another state). **copy** writes text to the clipboard: `on(CopyLink, { copy: (e) => e.url })` (on an event: the
+  browser allows it only right after a click).
 
 <!-- more -->
 
@@ -55,13 +62,15 @@ export const m = machine({
       }),
     },
     removing: { invoke: invoke(removeItem, { input: { id: ctx.target }, done: 'idle', failed: { Unexpected: 'idle' } }) },
-    flash: { after: [{ ms: 3000, target: 'idle' }], ignore: [Add] },    // timers; ignore only without invoke
+    flash: { on: [on(Add, { target: 'adding' })], after: [{ ms: 3000, target: 'idle' }] },   // a toast; the page stays usable
   }),
 })
 ```
 - **assign** values are event (`e`), result (`r`) or error fields, context, literals, operators and `fn()` calls.
-- **guard** conditions: comparisons, `&&`, `||`, `!`, or a boolean `fn()`.
-- **navigate** sends the browser to `ui.link(route, params, search?)` after the transition.
+- **guard** conditions: a field (`() => ctx.auto`), comparisons, `&&`, `||`, `!`, or a boolean `fn()`.
+- **navigate** sends the browser to `ui.link(route, params, search?)` after the transition. It returns one link: to
+  choose between links, write one guarded transition per link (`[{ guard: () => …, navigate: … }, { navigate: … }]`);
+  a `?:` inside `navigate` is HZ014.
 - `done` and each `failed` entry take a state name, one transition, or a list of guarded transitions.
 - **Shared transitions:** `machine({ on })` entries are copied into every state that has no `invoke`, is not final,
   and neither handles nor ignores the event itself. Without `target` they stay in the state they fire in; one
@@ -69,6 +78,6 @@ export const m = machine({
 - **Start from the URL:** a view with a `route` may declare `seed: ({ params, search }) => ({ q: search.q })`; the
   page's machine then starts with those context fields (server render, hydration and no-JS posts alike). One view
   per page may seed a machine (HZ048).
-- A transition to the same state re-enters it. In an app with `site.locales`, machines never hold
+- In an app with `site.locales`, machines never hold
   translated text (HZ041): store a code (`ctx.error = 'duplicate'`) and choose the message in the view. The
   scaffold does this in every app.

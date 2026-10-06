@@ -95,7 +95,6 @@ routes.ts          網址與參數
 hozu.config.ts     頁面設定
 worker/
   index.ts         Cloudflare Worker 入口（載入價格快照）
-  bundle-stub.ts   取代 @hozu/bundle（Worker 不需要執行期打包工具）
 scripts/
   sync-catalog.ts     下載並整理農糧署「每月盛產農產品產地」
   sync-volume.ts      彙整農業部過去 12 個月的交易量
@@ -107,7 +106,6 @@ scripts/
   check-pages.ts      檢查線上重要頁面（每 3 小時 workflow 使用）
   price-snapshot.ts   產生價格快照（農業部失敗時寫入「無價格」快照，不擋部署）
   build-worker.ts     以 esbuild＋Hozu 外掛打包 Worker
-  worker-manifest.ts  校正 Worker 的建置紀錄雜湊（見下方「Hozu 元件與 Workers」）
 wrangler.jsonc     Cloudflare 設定
 .github/workflows/deploy.yml        自動部署
 .github/workflows/sync-catalog.yml  每週同步開放資料與交易量，有變動就開 PR
@@ -168,19 +166,8 @@ flowchart LR
   - `CLOUDFLARE_API_TOKEN`：Cloudflare 後台 → My Profile → API Tokens → 用「Edit Cloudflare Workers」範本建立
   - `CLOUDFLARE_ACCOUNT_ID`：Cloudflare 後台 Workers 頁面右側
 - **手動部署**：`npx wrangler login` 後執行 `npm run deploy`。
-- **為什麼打包要自己做**：Worker 需要 Hozu 的 esbuild 外掛（`@hozu/transform/esbuild`）；workerd 沒有 `import.meta.url`，`scripts/build-worker.ts` 會替每個檔案填入它自己的路徑（元件和樣式靠它找到建置產物）。
-
-### Hozu 元件與 Workers（暫時的校正）
-
-Hozu 0.17 用 `sha256(String(render))` 當作 `ui.component` 的指紋，並納入建置紀錄的 `irHash`。打包會重排程式碼文字，所以只要專案用到 `ui.component`（或 `fn()`），Worker 啟動時就會出現 `The build manifest does not match this project`。頁面（views）是以結構比對，不受影響。
-
-`scripts/worker-manifest.ts` 的處理方式：
-
-1. 打包後在 Node 載入 Worker，讀出它的 IR 與雜湊
-2. 用 `hozu inspect --json` 逐一比對每個 feature，**只允許元件層級的 `sourceHash` 不同**；任何其他差異都會讓建置失敗（代表建置真的過期）
-3. 產生 `dist/worker/manifest.json`（只換掉 `irHash`），再打包一次
-
-這個做法依賴 Hozu 內部的檢查程式碼；若 Hozu 改版導致找不到，建置會明確報錯。已回報 Hozu（[olevatorr/Hozu#1](https://github.com/olevatorr/Hozu/issues/1)，0.17.1 與 0.19.0 皆可重現），修正後即可移除。
+- **為什麼打包要自己做**：Worker 需要以 Hozu 的 esbuild 外掛（`@hozu/transform/esbuild`）打包，它會替每個檔案填入自己的 `import.meta.url`（workerd 沒有），元件和樣式靠它找到建置產物。`worker/index.ts` 直接使用 `hozu build` 的 `dist/manifest.json`。
+- **曾經的繞道做法（已移除）**：Hozu 0.17–0.20.1 以函式文字當作元件指紋，打包後 Worker 會因「建置紀錄不符」拒絕啟動，所以曾經自己校正雜湊、替換 `@hozu/bundle`。我們回報的 [olevatorr/Hozu#1](https://github.com/olevatorr/Hozu/issues/1) 已在 **0.20.2** 修正，這些程式碼已經刪除。
 
 ## 品項照片
 
