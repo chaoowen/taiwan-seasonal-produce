@@ -9,7 +9,7 @@ import {
   searchIcon,
   sproutIcon,
 } from './icons.ts'
-import { FavoriteButton, FavoritesList } from './components.ts'
+import { FavoriteButton, FavoritesList, StickyTabs } from './components.ts'
 import {
   getToday,
   listCatalog,
@@ -370,21 +370,20 @@ const sectionTab = part((label: string, href: string) =>
   ]),
 )
 
-/** Jump links to the three sections; sticks under the fixed header once scrolled up to it (CSS only). */
+/**
+ * Jump links to the three sections; sticks under the fixed header once scrolled up to it. Transparent until
+ * stuck, then the filter bar's cream across the full width (StickyTabs + the `section-tabs` utility).
+ */
 const sectionTabs = part(() =>
-  ui.nav(
-    {
-      'aria-label': '頁面區塊',
-      class: 'sticky top-(--header-height) z-30 -mx-4 border-b border-line bg-canvas/95 px-4 backdrop-blur-sm sm:-mx-6 sm:px-6',
-    },
-    [
+  ui.use(StickyTabs, { class: 'section-tabs sticky top-(--header-height) z-30' }, [
+    ui.nav({ 'aria-label': '頁面區塊' }, [
       ui.ul({ class: 'flex gap-6 overflow-x-auto' }, [
         sectionTab('當月建議購買', '#picks'),
         sectionTab('當季蔬菜', '#vegetables'),
         sectionTab('當季水果', '#fruits'),
       ]),
-    ],
-  ),
+    ]),
+  ]),
 )
 
 /** 篩選欄: plain links like the month chips, so the filter is in the URL and needs no JavaScript. */

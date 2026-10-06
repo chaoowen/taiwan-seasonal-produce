@@ -20,7 +20,7 @@
 - 參數可以組合，例如 `/?month=1&show=peak`。超出範圍的值（例如 `?month=13`）會自動退回預設。
 - **收藏**：每張卡片右上角的 ♡。只存在這台裝置的這個瀏覽器，多個分頁會同步；清除瀏覽資料、換裝置或無痕模式就不會保留。沒有 JavaScript 時不顯示收藏按鈕。
 - **頁首**固定在最上方（各種螢幕寬度都維持一行），導覽以底線標示目前頁面。
-- **區塊 tab**（篩選欄上方）：當月建議購買／當季蔬菜／當季水果，點擊平滑捲動到該區塊；往上捲時固定在頁首下方。純 CSS（錨點連結＋`position: sticky`），不需要 JavaScript；開啟「減少動態效果」時改為直接跳轉。高度與停靠位置由 `app.css` 的 `--header-height`、`--section-offset` 統一控制。
+- **區塊 tab**（篩選欄上方）：當月建議購買／當季蔬菜／當季水果，點擊平滑捲動到該區塊（錨點連結；開啟「減少動態效果」時直接跳轉）；往上捲時固定在頁首下方（`position: sticky`）。平常沒有底色，**固定住時才出現與篩選欄相同的米白底色，橫跨整個畫面寬度**：「是否固定住」由小型客戶端元件 `StickyTabs`（`IntersectionObserver`）判斷，底色由 `app.css` 的 `section-tabs` 繪製；沒有 JavaScript 時底色一律顯示。高度與停靠位置由 `--header-height`、`--section-offset` 統一控制。
 
 ## 快速開始
 
@@ -68,7 +68,7 @@ features/produce/
   taipei-date.ts   台灣日期、民國年格式
   model.ts         Hozu 資料格式與 query 定義
   views.ts         首頁、搜尋頁、收藏頁畫面
-  components.ts    客戶端元件：收藏按鈕 ♡、收藏清單
+  components.ts    客戶端元件：收藏按鈕 ♡、收藏清單、固定 tab 的底色判斷
   *.client.ts      上述元件在瀏覽器執行的程式
   favorites-store.ts  收藏的 localStorage 讀寫與同步
   icons.ts         SVG 圖示（Lucide）
