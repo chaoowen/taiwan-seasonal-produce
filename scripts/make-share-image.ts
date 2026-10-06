@@ -62,7 +62,7 @@ async function renderHtml(): Promise<string> {
 @font-face { font-family: Serif; src: url('${fileUrl('assets/fonts/noto-serif-tc.woff2')}'); font-weight: 400 700; }
 * { box-sizing: border-box; margin: 0; }
 body { width: ${SIZE.width}px; height: ${SIZE.height}px; overflow: hidden; padding: 56px 64px; display: flex; flex-direction: column; gap: 32px;
-  background: #ede6da url('${fileUrl('assets/linen.jpg')}'); background-size: 480px auto; color: #3e2c23; font-family: Sans, sans-serif; }
+  background: #ede6da url('${fileUrl('assets/linen.webp')}'); background-size: 480px auto; color: #3e2c23; font-family: Sans, sans-serif; }
 .title { font-family: Serif, serif; font-size: 64px; font-weight: 700; color: #3d5263; letter-spacing: 0.08em; }
 .sub { font-size: 30px; color: #6f5b4b; margin-top: 8px; }
 .cards { display: grid; grid-template-columns: repeat(${CARDS}, 1fr); gap: 20px; flex: 1; }
