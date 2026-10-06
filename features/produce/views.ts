@@ -1,6 +1,6 @@
 import { part, ui } from '@hozu/core'
 import type { z } from 'zod'
-import { favoritesPage, home, searchPage } from '../../routes.ts'
+import { favoritesPage, home, produceItem, searchPage } from '../../routes.ts'
 import {
   appleIcon,
   calendarIcon,
@@ -11,11 +11,14 @@ import {
 } from './icons.ts'
 import { FavoriteButton, FavoritesList, StickyTabs } from './components.ts'
 import {
+  getProduceDetail,
   getToday,
   listCatalog,
   searchProduce,
   type MonthOption,
   type Produce,
+  type CalendarMonth,
+  type ProduceDetail,
   type ProduceSearch,
   type SearchResult,
   type ShowOption,
@@ -87,6 +90,17 @@ const trendLine = part((item: Item) =>
   ),
 )
 
+/** An item's name linking to its page (season calendar, price trend, origin, tip). */
+const nameLink = part((item: Item) =>
+  ui.a(
+    {
+      href: ui.link(produceItem, { id: item.id }),
+      class: 'decoration-2 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+    },
+    [item.name],
+  ),
+)
+
 const tipBox = part((tip: string) =>
   ui.p({ class: 'rounded-md bg-accent-surface px-4 py-3 text-base text-ink' }, [
     ui.span({ class: 'font-bold text-accent-strong' }, ['挑選技巧　']),
@@ -119,7 +133,7 @@ const pickCard = part((item: Item) =>
       ]),
       favoriteToggle(item),
     ]),
-    ui.h3({ class: 'font-serif text-2xl font-bold text-ink' }, [item.name]),
+    ui.h3({ class: 'font-serif text-2xl font-bold text-ink' }, [nameLink(item)]),
     ui.p({ class: 'flex items-center gap-1.5 text-base text-ink-muted' }, [mapPinIcon(), item.origin]),
     item.priceLabel !== null &&
       ui.p({ class: 'flex flex-wrap items-baseline gap-x-2 gap-y-1' }, [
@@ -135,7 +149,7 @@ const produceCard = part((item: Item) =>
   ui.li({ class: `${cardFrame} flex flex-col gap-1.5 p-4` }, [
     cornerDot(),
     ui.div({ class: 'flex items-start justify-between gap-2' }, [
-      ui.h3({ class: 'font-serif text-lg font-bold text-ink' }, [item.name]),
+      ui.h3({ class: 'font-serif text-lg font-bold text-ink' }, [nameLink(item)]),
       favoriteToggle(item),
     ]),
     ui.p({ class: 'flex items-center gap-1 text-sm text-ink-muted' }, [mapPinIcon(), item.origin]),
@@ -157,7 +171,7 @@ const catalogCard = part((item: CatalogCard, isHidden: boolean) =>
       ]),
       favoriteToggle(item),
     ]),
-    ui.h3({ class: 'font-serif text-2xl font-bold text-ink' }, [item.name]),
+    ui.h3({ class: 'font-serif text-2xl font-bold text-ink' }, [nameLink(item)]),
     ui.p({ class: 'flex items-center gap-1.5 text-base text-ink-muted' }, [mapPinIcon(), item.origin]),
     ui.p({ class: 'text-base text-ink-muted' }, ['產季：', item.seasonText]),
     item.priceLabel !== null &&
@@ -463,6 +477,116 @@ const filterBar = part((today: TodayData, month: number | null) =>
   ]),
 )
 
+// ---- Item page ----
+
+const calendarCell = part((month: z.infer<typeof CalendarMonth>) =>
+  ui.li(
+    {
+      'aria-current': month.isCurrent ? 'date' : 'false',
+      class: 'flex min-h-11 items-center justify-center rounded-md border text-sm font-medium tabular-nums',
+      toggle: {
+        'border-brand-strong bg-brand-strong text-on-brand': month.level === 'peak',
+        'border-brand-soft bg-brand-soft text-brand-strong': month.level === 'season',
+        'border-line bg-surface text-ink-muted': month.level === 'off',
+        'ring-2 ring-accent ring-offset-2 ring-offset-canvas': month.isCurrent,
+      },
+    },
+    [
+      month.label,
+      month.level === 'peak' && ui.span({ class: 'sr-only' }, ['（盛產）']),
+      month.level === 'season' && ui.span({ class: 'sr-only' }, ['（當季）']),
+    ],
+  ),
+)
+
+const legendSwatch = part((label: string, swatch: string) =>
+  ui.span({ class: 'inline-flex items-center gap-1.5' }, [ui.span({ class: swatch, 'aria-hidden': 'true' }, []), label]),
+)
+
+/** 30-day trend at page size, with its description visible too. */
+const bigTrend = part((item: Item) =>
+  item.trendPath !== null &&
+  ui.figure({ class: 'space-y-2' }, [
+    ui.svg(
+      {
+        viewBox: '0 0 100 28',
+        preserveAspectRatio: 'none',
+        role: 'img',
+        'aria-label': item.trendLabel ?? '',
+        class: 'h-24 w-full',
+        toggle: { 'text-bargain': item.trend === 'down', 'text-ink-muted': item.trend !== 'down' },
+      },
+      [ui.path({ d: item.trendPath, fill: 'none', stroke: 'currentColor', 'stroke-width': '2', 'stroke-linejoin': 'round', 'stroke-linecap': 'round', 'vector-effect': 'non-scaling-stroke' }, [])],
+    ),
+    ui.figcaption({ class: 'text-sm text-ink-muted' }, [item.trendLabel ?? '']),
+  ]),
+)
+
+const detailBlock = part((title: string, children: ReturnType<typeof ui.div>) =>
+  ui.section({ class: `${cardFrame} space-y-4 p-6` }, [
+    cornerDot(),
+    ui.h2({ class: 'font-serif text-xl font-bold text-brand-strong' }, [title]),
+    children,
+  ]),
+)
+
+const produceDetail = part((detail: z.infer<typeof ProduceDetail>) =>
+  ui.article({ class: 'space-y-8' }, [
+    ui.a(
+      { href: ui.link(home, null), class: 'inline-flex min-h-11 items-center text-base font-medium text-brand-strong decoration-2 underline-offset-8 hover:underline' },
+      ['← 回到當季蔬果'],
+    ),
+    ui.header({ class: 'space-y-3' }, [
+      ui.div({ class: 'flex items-start justify-between gap-4' }, [
+        ui.h1({ class: 'font-serif text-4xl font-bold tracking-wide text-ink sm:text-5xl' }, [detail.item.name]),
+        favoriteToggle(detail.item),
+      ]),
+      ui.div({ class: 'flex flex-wrap items-center gap-2' }, [
+        kindBadge(detail.item),
+        reasonBadge(detail.item.isInSeason ? '本月當季' : '非當季'),
+        detail.item.isPeak && reasonBadge('盛產期'),
+        detail.aliases.length > 0 &&
+          ui.span({ class: 'text-base text-ink-muted' }, ['也稱：', ui.each(detail.aliases, null, (alias) => ui.span({ class: 'mr-2' }, [alias]))]),
+      ]),
+    ]),
+    ui.div({ class: 'grid gap-6 lg:grid-cols-2' }, [
+      detailBlock(
+        '批發價',
+        ui.div({ class: 'space-y-3' }, [
+          detail.item.priceLabel !== null
+            ? ui.p({ class: 'flex flex-wrap items-baseline gap-x-3 gap-y-1' }, [
+                ui.span({ class: 'font-serif text-3xl font-bold text-ink tabular-nums' }, [detail.item.priceLabel]),
+                changeText(detail.item),
+              ])
+            : ui.p({ class: 'text-base text-ink-muted' }, ['目前沒有這項作物的批發行情（非產季，或市場上沒有單一價格）。']),
+          bigTrend(detail.item),
+        ]),
+      ),
+      detailBlock(
+        '產季月曆',
+        ui.div({ class: 'space-y-3' }, [
+          ui.ol({ class: 'grid grid-cols-6 gap-2 sm:grid-cols-12 lg:grid-cols-6' }, [ui.each(detail.calendar, 'id', (month) => calendarCell(month))]),
+          ui.p({ class: 'flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-muted' }, [
+            legendSwatch('盛產', 'size-3 rounded-sm bg-brand-strong'),
+            legendSwatch('當季', 'size-3 rounded-sm bg-brand-soft'),
+            legendSwatch('本月', 'size-3 rounded-sm ring-2 ring-accent'),
+            `產季：${detail.item.seasonText}`,
+          ]),
+        ]),
+      ),
+      detailBlock('主要產地', ui.div({}, [ui.p({ class: 'flex items-center gap-1.5 text-base text-ink' }, [mapPinIcon(), detail.item.origin])])),
+      detailBlock(
+        '挑選技巧',
+        ui.div({}, [
+          detail.item.tip !== null
+            ? ui.p({ class: 'text-base text-ink' }, [detail.item.tip])
+            : ui.p({ class: 'text-base text-ink-muted' }, ['這項作物還沒有挑選技巧。']),
+        ]),
+      ),
+    ]),
+  ]),
+)
+
 // ---- Pages ----
 
 /** The top padding leaves room for the fixed header (one line, --header-height, at every width). */
@@ -519,6 +643,22 @@ export const FavoritesPage = ui.view({
       ui.query(listCatalog, {}, {
         ready: (cards) => favoritesSection(cards),
         failed: { Unexpected: () => unavailable('暫時無法載入蔬果資料，請稍後再試。') },
+      }),
+      footerNote(),
+    ]),
+})
+
+export const ProducePage = ui.view({
+  route: produceItem,
+  render: ({ params }) =>
+    ui.main({ class: `${pageMain} space-y-12` }, [
+      ui.header({}, [siteHeader('home')]),
+      ui.query(getProduceDetail, { id: params.id }, {
+        ready: (detail) => produceDetail(detail),
+        failed: {
+          NotFound: () => unavailable('找不到這項蔬果。'),
+          Unexpected: () => unavailable('暫時無法載入這項蔬果，請稍後再試。'),
+        },
       }),
       footerNote(),
     ]),
