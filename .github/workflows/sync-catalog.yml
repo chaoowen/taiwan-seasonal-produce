@@ -1,0 +1,52 @@
+# Weekly check of the AFA open dataset 每月盛產農產品產地. When data/afa-peak-season.json changes, it opens a
+# pull request for review instead of changing the site directly (the data is updated irregularly and new
+# crops may need a profile in features/produce/crop-profiles.ts).
+name: Sync open-data catalog
+
+on:
+  schedule:
+    # Mondays 01:00 UTC = 09:00 Asia/Taipei.
+    - cron: '0 1 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      # The sync script only uses Node built-ins, so no npm install is needed.
+      - run: node scripts/sync-catalog.ts
+
+      - name: Open a pull request if the data changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- data/; then
+            echo "Open data unchanged."
+            exit 0
+          fi
+          branch="data/afa-sync-$(date -u +%Y%m%d)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git commit -am "data: sync AFA peak-season dataset ($(date -u +%Y-%m-%d))"
+          git push --force -u origin "$branch"
+          if [ -n "$(gh pr list --head "$branch" --json number --jq '.[].number')" ]; then
+            echo "A pull request for $branch already exists."
+            exit 0
+          fi
+          # Needs Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests";
+          # without it this step fails, and GitHub emails the failure.
+          gh pr create --base main --head "$branch" \
+            --title "data: AFA peak-season dataset changed ($(date -u +%Y-%m-%d))" \
+            --body "Weekly sync of 每月盛產農產品產地. Review the diff of data/afa-peak-season.json: new crops appear on the site without a picking tip until they get a profile in features/produce/crop-profiles.ts."
