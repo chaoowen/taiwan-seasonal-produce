@@ -49,7 +49,8 @@ npm run dev      # 開發伺服器：http://127.0.0.1:3000
 | `npm run sync:catalog` | 從農糧署開放資料更新 `data/afa-peak-season.json`（每週自動執行並開 PR） |
 | `npm run fonts` | 重新產生字型子集 `assets/fonts/*.woff2`（新增中文字後執行） |
 | `npm run snapshot:prices` | 抓農業部行情、產生價格快照 `.cache/price-snapshot.json` |
-| `npm run build:worker` | 字型子集＋建置＋價格快照＋打包 Cloudflare Worker（`dist/worker/`） |
+| `npm run share-image` | 產生首頁分享圖卡 `assets/share.jpg`（需要 Chrome；先有價格快照會更準） |
+| `npm run build:worker` | 字型子集＋價格快照＋分享圖卡＋建置＋打包 Cloudflare Worker（`dist/worker/`） |
 | `npm run preview:worker` | 在本機用 Cloudflare 執行環境（workerd）預覽：http://127.0.0.1:8787 |
 | `npm run deploy` | 手動部署到 Cloudflare（需先 `npx wrangler login`） |
 
@@ -94,6 +95,7 @@ scripts/
   sync-catalog.ts     下載並整理農糧署「每月盛產農產品產地」
   fetch-photos.ts     從 Wikimedia Commons 取得自由授權照片、裁切壓縮、產生 photos.css
   subset-fonts.ts     產生只含網站用字的 Noto TC 字型（見下方「字型」）
+  make-share-image.ts 產生每日分享圖卡（headless Chrome＋sharp）
   check-price-freshness.ts  檢查線上價格是否過期（每日 workflow 使用）
   price-snapshot.ts   產生價格快照（農業部失敗時寫入「無價格」快照，不擋部署）
   build-worker.ts     以 esbuild＋Hozu 外掛打包 Worker
@@ -179,6 +181,7 @@ Hozu 0.17 用 `sha256(String(render))` 當作 `ui.component` 的指紋，並納�
 - 網站網址設為正式網址（`hozu.config.ts` 的 `site.url`），canonical 與 Open Graph 連結都由它產生。
 - `/sitemap.xml` 由 Hozu 依品項頁的 `entries` 自動產生（首頁、搜尋頁＋77 個品項頁）；`/robots.txt` 排除 `noindex` 的收藏頁與範本頁。
 - 每個品項頁有專屬標題與描述，例如「芒果｜產季、價格與挑選技巧」。
+- **分享縮圖（Open Graph）**：首頁與搜尋頁使用每日圖卡 `assets/share.jpg`（1200×630：日期＋今日前 4 名建議購買的照片與降幅），由 `scripts/make-share-image.ts` 在每次部署時以 headless Chrome 依網站字型與布紋截圖產生；找不到 Chrome 或失敗時沿用已提交的圖卡，不擋部署。品項頁使用該品項的 Commons 照片（`Special:FilePath`，寬 1200），沒有照片時用每日圖卡。
 
 ## 字型
 

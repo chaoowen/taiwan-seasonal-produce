@@ -18,8 +18,16 @@ export function hasPhoto(id: string): boolean {
   return id in CREDITS
 }
 
-/** Attribution for the item page, as the CC licences require; null when the item has no photo. */
+/** Share-card width for item pages (Open Graph recommends 1200). */
+const SHARE_WIDTH = 1200
+
+/**
+ * Attribution for the item page, as the CC licences require, and a share image URL (Commons resizes via
+ * Special:FilePath); null when the item has no photo.
+ */
 export function getPhotoCredit(id: string) {
   const credit = CREDITS[id]
-  return credit ? { author: credit.author, license: credit.license, sourceUrl: credit.sourceUrl } : null
+  if (!credit) return null
+  const imageUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(credit.file)}?width=${SHARE_WIDTH}`
+  return { author: credit.author, license: credit.license, sourceUrl: credit.sourceUrl, imageUrl }
 }
