@@ -70,6 +70,42 @@ html {
   }
 }
 
+/*
+ * Section tabs: no background while in the flow; once stuck under the header (StickyTabs sets data-stuck),
+ * the filter bar's cream spans the full viewport width behind the centred tabs. Without JavaScript the
+ * background is always on, so stuck tabs never sit unreadably over the cards.
+ */
+@utility section-tabs {
+  position: sticky;
+  &::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    left: 50%;
+    z-index: -1;
+    width: 100vw;
+    translate: -50% 0;
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-line);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    transition: opacity 150ms ease-out;
+  }
+  &[data-stuck]::before {
+    opacity: 1;
+  }
+  @media (scripting: none) {
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
+/* The full-width tab background reaches 100vw, which includes classic scrollbars: never scroll sideways. */
+body {
+  overflow-x: clip;
+}
+
 /* Vertical section titles (直排), as in traditional Chinese layouts. */
 @utility vertical-rl {
   writing-mode: vertical-rl;

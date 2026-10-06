@@ -57,3 +57,18 @@ export const FavoritesList = ui.component({
   load: 'eager',
   render: ({ children }) => ui.div({}, [...children]),
 })
+
+/**
+ * Wraps the section tabs so they can get a background only while stuck under the header: the client
+ * module sets `data-stuck` (CSS alone can't tell "stuck" apart in Safari/Firefox). The caller makes the
+ * root sticky; app.css's `section-tabs` utility draws the full-width background.
+ */
+export const StickyTabs = ui.component({
+  tag: 'div',
+  props: z.object({}),
+  emits: {},
+  children: true,
+  client: new URL('./stickyTabs.client.ts', import.meta.url),
+  load: 'eager',
+  render: ({ children }) => ui.div({}, [...children]),
+})
