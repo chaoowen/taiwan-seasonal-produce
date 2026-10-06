@@ -19,6 +19,9 @@ export const Produce = z.object({
   /** e.g. "比近 30 天便宜 18%". */
   changeLabel: z.string().nullable(),
   trend: z.enum(['down', 'up', 'flat']).nullable(),
+  /** 30-day sparkline (SVG path for a 100×28 viewBox) and its description; null without enough prices. */
+  trendPath: z.string().nullable(),
+  trendLabel: z.string().nullable(),
 })
 
 /** `otherMonth`: prices exist only for the current month; `unavailable`: the MOA API failed. */

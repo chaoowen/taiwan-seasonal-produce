@@ -17,6 +17,8 @@ export interface ItemPrice {
   price: number
   /** Change against the rest of the 30-day window, e.g. −0.18 = 18% cheaper; null without a baseline. */
   changePct: number | null
+  /** Daily average per trading day in the window, oldest first (one decimal); null where it didn't trade. */
+  series: (number | null)[]
 }
 
 export interface PriceSummary {
@@ -79,7 +81,11 @@ function getItemPrice(item: CatalogItem, days: TradeDay[]): ItemPrice | null {
   if (price === null) return null
 
   const baseline = weightedAverage(rowsByDay.slice(latestIndex + 1).flat())
-  return { price, changePct: baseline ? (price - baseline) / baseline : null }
+  const series = rowsByDay.toReversed().map((rows) => {
+    const average = weightedAverage(rows)
+    return average === null ? null : Math.round(average * 10) / 10
+  })
+  return { price, changePct: baseline ? (price - baseline) / baseline : null, series }
 }
 
 async function loadSummary(items: CatalogItem[], now: Date): Promise<PriceSummary> {
