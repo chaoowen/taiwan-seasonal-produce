@@ -121,3 +121,28 @@ export const getStatus = endpoint({
     }),
   }),
 })
+
+export const CalendarMonth = z.object({
+  id: z.string(),
+  label: z.string(),
+  /** peak: 盛產; season: 當季; off: not in season. */
+  level: z.enum(['peak', 'season', 'off']),
+  isCurrent: z.boolean(),
+})
+
+export const ProduceDetail = z.object({
+  item: SearchResult,
+  calendar: z.array(CalendarMonth),
+  /** Official names it is also known by (e.g. 甘藍 for 高麗菜). */
+  aliases: z.array(z.string()),
+})
+
+/** One item's page; NotFound for an unknown id (the page answers 404). */
+export const getProduceDetail = query({
+  input: z.object({ id: z.string() }),
+  output: ProduceDetail,
+  errors: { NotFound: z.object({ id: z.string() }) },
+  scope: 'public',
+  freshness: 'request',
+  runs: 'server',
+})

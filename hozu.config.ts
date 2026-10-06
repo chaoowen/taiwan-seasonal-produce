@@ -1,18 +1,20 @@
 import { project, ui } from '@hozu/core'
 import { zodAdapter } from '@hozu/schema-zod'
 import { produce } from './features/produce/feature.ts'
-import { FavoritesPage, Home, SearchPage } from './features/produce/views.ts'
+import { getProduceDetail, listCatalog } from './features/produce/model.ts'
+import { FavoritesPage, Home, ProducePage, SearchPage } from './features/produce/views.ts'
 import { site } from './features/site/feature.ts'
 import { Home as DemoHome } from './features/site/views.ts'
-import { demo, favoritesPage, home, searchPage } from './routes.ts'
+import { demo, favoritesPage, home, produceItem, searchPage } from './routes.ts'
 
 export default project({
   schema: zodAdapter,
   styles: new URL('./app.css', import.meta.url),
   app: new URL('./app.ts', import.meta.url),
   env: { files: ['.env', '.env.local'] },
-  site: { url: 'http://localhost:3000', name: '台灣當季蔬果', lang: 'zh-Hant-TW' },
-  routes: { home, searchPage, favoritesPage, demo },
+  // The public origin: canonical links, Open Graph URLs and /sitemap.xml are built from it.
+  site: { url: 'https://taiwan-seasonal-produce.chaoowen88.workers.dev', name: '台灣當季蔬果', lang: 'zh-Hant-TW' },
+  routes: { home, searchPage, favoritesPage, produceItem, demo },
   pages: [
     ui.page(home, {
       views: [Home],
@@ -23,6 +25,20 @@ export default project({
     ui.page(searchPage, {
       views: [SearchPage],
       head: { render: () => ({ title: '搜尋蔬果｜台灣當季蔬果', description: '搜尋台灣常見蔬果的產季、批發價與挑選技巧' }) },
+    }),
+    ui.page(produceItem, {
+      views: [ProducePage],
+      head: {
+        query: getProduceDetail,
+        input: (params) => ({ id: params.id }),
+        render: ({ item }) => ({
+          title: `${item.name}｜產季、價格與挑選技巧｜台灣當季蔬果`,
+          description: `${item.name}產季 ${item.seasonText}，主要產地 ${item.origin}。${item.tip ? `挑選技巧：${item.tip}` : ''}`,
+        }),
+        failed: { NotFound: 404 },
+      },
+      // Every catalog item is listed in /sitemap.xml.
+      entries: { query: listCatalog, input: {}, params: (item) => ({ id: item.id }) },
     }),
     ui.page(favoritesPage, {
       views: [FavoritesPage],

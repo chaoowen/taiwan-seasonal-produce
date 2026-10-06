@@ -8,6 +8,7 @@
 | ---- | ---- | ---- |
 | 首頁 | `/` | 依台灣時間（Asia/Taipei）判斷當月：建議購買、當季蔬菜、當季水果 |
 | 搜尋 | `/search?q=草莓` | 搜尋全部 77 種蔬果（不限當季），可用官方品名，例如「甘藍」找到高麗菜、「結球白菜」找到大白菜 |
+| 品項頁 | `/produce/mango` | 單一蔬果：產季月曆（盛產／當季／本月）、批發價與 30 天走勢、主要產地、挑選技巧、也稱（官方品名）。卡片上的品名都可以點進來；找不到時回應 404 |
 | 我的收藏 | `/favorites` | 收藏的蔬果（不限當季），存在瀏覽器的 localStorage |
 | 範本首頁 | `/demo` | `create-hozu` 產生的範本，保留對照用 |
 | 狀態 API | `/api/status` | JSON：價格來源、快照產生時間、最近交易日（供每日檢查使用） |
@@ -67,7 +68,9 @@ features/produce/
   trend.ts         價格序列 → 走勢線 SVG 路徑與文字描述
   prices.ts        價格來源：部署快照，或即時計算（全目錄算一次、快取 1 小時）
   season.ts        組合當月清單、推薦與篩選
-  search.ts        全目錄搜尋、收藏頁用的全目錄卡片、產季文字
+  catalog-cards.ts 共用的品項卡片資料（價格、產季文字、是否當季）
+  search.ts        全目錄搜尋、收藏頁用的全目錄卡片
+  detail.ts        品項頁資料：卡片＋12 個月產季月曆
   taipei-date.ts   台灣日期、民國年格式
   model.ts         Hozu 資料格式與 query 定義
   views.ts         首頁、搜尋頁、收藏頁畫面
@@ -157,6 +160,12 @@ Hozu 0.17 用 `sha256(String(render))` 當作 `ui.component` 的指紋，並納�
 3. 產生 `dist/worker/manifest.json`（只換掉 `irHash`），再打包一次
 
 這個做法依賴 Hozu 內部的檢查程式碼；若 Hozu 改版導致找不到，建置會明確報錯。已回報 Hozu（[olevatorr/Hozu#1](https://github.com/olevatorr/Hozu/issues/1)，0.17.1 與 0.19.0 皆可重現），修正後即可移除。
+
+## SEO
+
+- 網站網址設為正式網址（`hozu.config.ts` 的 `site.url`），canonical 與 Open Graph 連結都由它產生。
+- `/sitemap.xml` 由 Hozu 依品項頁的 `entries` 自動產生（首頁、搜尋頁＋77 個品項頁）；`/robots.txt` 排除 `noindex` 的收藏頁與範本頁。
+- 每個品項頁有專屬標題與描述，例如「芒果｜產季、價格與挑選技巧」。
 
 ## 字型
 
