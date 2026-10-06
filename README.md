@@ -16,6 +16,7 @@
 | 首頁功能 | 說明 | 網址參數 |
 | -------- | ---- | -------- |
 | 建議購買 | 正值盛產期，**或**批發價比近 30 天便宜 10% 以上。依「便宜幅度＋盛產 0.15 分」排序，**只顯示前 8 名**，其餘收在「看更多」（同分時蔬菜、水果交錯） | — |
+| 品項照片 | 建議購買、搜尋、收藏卡片與品項頁顯示照片（72/77 項，來自 Wikimedia Commons 自由授權），品項頁標示作者與授權 | — |
 | 價格走勢 | 每張卡片附近 30 天的每日批發均價走勢線（伺服器產生 SVG，下跌時為紫羅蘭色），並有文字描述供螢幕閱讀器使用 | — |
 | 切換月份 | 查看其他月份的產季（價格只提供本月） | `?month=1`–`12` |
 | 篩選 | 全部／價格划算／盛產期，三個區塊同時套用 | `?show=all\|cheap\|peak` |
@@ -59,6 +60,9 @@ npm run dev      # 開發伺服器：http://127.0.0.1:3000
 ```
 data/
   afa-peak-season.json  農糧署開放資料整理結果（腳本產生，勿手改）
+  photo-credits.json    品項照片的 Commons 檔名、作者、授權（腳本產生）
+assets/photos/     品項照片，640×480 JPEG（腳本產生）
+photos.css         每張照片一條 `[data-photo="…"]` 規則（腳本產生，app.css 匯入）
 features/produce/
   crop-profiles.ts 人工資料：顯示名稱、挑選技巧、已驗證的盛產月、與官方品名的對照、官方沒有的品項
   catalog.ts       合併開放資料與人工資料，產生 77 種蔬果目錄
@@ -77,6 +81,7 @@ features/produce/
   components.ts    客戶端元件：收藏按鈕 ♡、收藏清單、固定 tab 的底色判斷
   *.client.ts      上述元件在瀏覽器執行的程式
   favorites-store.ts  收藏的 localStorage 讀寫與同步
+  photos.ts        哪些品項有照片、照片出處（讀 data/photo-credits.json）
   icons.ts         SVG 圖示（Lucide）
 app.ts             伺服器端 resolvers
 app.css            色彩、字型、背景
@@ -87,6 +92,7 @@ worker/
   bundle-stub.ts   取代 @hozu/bundle（Worker 不需要執行期打包工具）
 scripts/
   sync-catalog.ts     下載並整理農糧署「每月盛產農產品產地」
+  fetch-photos.ts     從 Wikimedia Commons 取得自由授權照片、裁切壓縮、產生 photos.css
   subset-fonts.ts     產生只含網站用字的 Noto TC 字型（見下方「字型」）
   check-price-freshness.ts  檢查線上價格是否過期（每日 workflow 使用）
   price-snapshot.ts   產生價格快照（農業部失敗時寫入「無價格」快照，不擋部署）
@@ -160,6 +166,13 @@ Hozu 0.17 用 `sha256(String(render))` 當作 `ui.component` 的指紋，並納�
 3. 產生 `dist/worker/manifest.json`（只換掉 `irHash`），再打包一次
 
 這個做法依賴 Hozu 內部的檢查程式碼；若 Hozu 改版導致找不到，建置會明確報錯。已回報 Hozu（[olevatorr/Hozu#1](https://github.com/olevatorr/Hozu/issues/1)，0.17.1 與 0.19.0 皆可重現），修正後即可移除。
+
+## 品項照片
+
+- 來源：每個品項 zh.wikipedia 條目的代表圖，只接受**自由授權**（CC0、CC BY、CC BY-SA、公有領域；GFDL／GPL 因需附全文而排除）。條目圖不合適（植株、手繪圖、無關照片）時，在 `scripts/fetch-photos.ts` 的 `PHOTO_OVERRIDES` 指定人工挑選的 Commons 檔案；`null` 代表不放照片（目前茼蒿、嫩薑、桂竹筍、茂谷柑、文旦柚）。
+- 處理：裁成 640×480、壓縮（中位數約 40 KB，全部約 2.9 MB）。
+- 顯示：以 CSS 背景圖呈現（`data-photo` 屬性對應 `photos.css`），所以 Node 與 Cloudflare 都由 Hozu 的 CSS 資產流程提供；只有實際顯示的卡片會下載照片（收起的「看更多」不下載）。
+- 新增照片或調整：執行 `npm run photos`，再人工檢查。
 
 ## SEO
 

@@ -101,6 +101,17 @@ const nameLink = part((item: Item) =>
   ),
 )
 
+/** The item's photo as a CSS background (photos.css maps data-photo to the file); nothing when there's none. */
+const photo = part((item: Item, size: string) =>
+  item.hasPhoto &&
+  ui.div({
+    'data-photo': item.id,
+    role: 'img',
+    'aria-label': `${item.name}的照片`,
+    class: `${size} rounded-md bg-line bg-cover bg-center`,
+  }, []),
+)
+
 const tipBox = part((tip: string) =>
   ui.p({ class: 'rounded-md bg-accent-surface px-4 py-3 text-base text-ink' }, [
     ui.span({ class: 'font-bold text-accent-strong' }, ['挑選技巧　']),
@@ -125,6 +136,7 @@ const favoriteToggle = part((item: Item) =>
 const pickCard = part((item: Item) =>
   ui.li({ class: `${cardFrame} flex flex-col gap-3 p-5` }, [
     cornerDot(),
+    photo(item, 'aspect-[4/3] w-full'),
     ui.div({ class: 'flex items-start gap-2' }, [
       ui.div({ class: 'flex flex-1 flex-wrap items-center gap-2' }, [
         kindBadge(item),
@@ -164,6 +176,7 @@ const produceCard = part((item: Item) =>
 const catalogCard = part((item: CatalogCard, isHidden: boolean) =>
   ui.li({ class: `${cardFrame} flex flex-col gap-3 p-5`, hidden: isHidden, 'data-produce-id': item.id }, [
     cornerDot(),
+    photo(item, 'aspect-[4/3] w-full'),
     ui.div({ class: 'flex items-start gap-2' }, [
       ui.div({ class: 'flex flex-1 flex-wrap items-center gap-2' }, [
         kindBadge(item),
@@ -252,7 +265,10 @@ const picksSection = part((today: TodayData) =>
               ui.span({ class: 'hidden group-open:inline' }, ['收起']),
             ],
           ),
-          ui.ul({ class: cardGrid }, [ui.each(today.morePicks, 'id', (item) => pickCard(item))]),
+          // display:none while closed: Chrome lays out (and fetches photos for) closed <details> content otherwise.
+          ui.ul({ class: 'hidden gap-5 group-open:grid sm:grid-cols-2 xl:grid-cols-3' }, [
+            ui.each(today.morePicks, 'id', (item) => pickCard(item)),
+          ]),
         ]),
     ]),
   ]),
@@ -536,7 +552,8 @@ const produceDetail = part((detail: z.infer<typeof ProduceDetail>) =>
       { href: ui.link(home, null), class: 'inline-flex min-h-11 items-center text-base font-medium text-brand-strong decoration-2 underline-offset-8 hover:underline' },
       ['← 回到當季蔬果'],
     ),
-    ui.header({ class: 'space-y-3' }, [
+    ui.header({ class: 'grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] md:items-start' }, [
+      ui.div({ class: 'space-y-3' }, [
       ui.div({ class: 'flex items-start justify-between gap-4' }, [
         ui.h1({ class: 'font-serif text-4xl font-bold tracking-wide text-ink sm:text-5xl' }, [detail.item.name]),
         favoriteToggle(detail.item),
@@ -548,6 +565,20 @@ const produceDetail = part((detail: z.infer<typeof ProduceDetail>) =>
         detail.aliases.length > 0 &&
           ui.span({ class: 'text-base text-ink-muted' }, ['也稱：', ui.each(detail.aliases, null, (alias) => ui.span({ class: 'mr-2' }, [alias]))]),
       ]),
+      ]),
+      detail.item.hasPhoto &&
+        ui.figure({ class: 'space-y-1.5' }, [
+          photo(detail.item, 'aspect-[4/3] w-full'),
+          detail.photoCredit !== null &&
+            ui.figcaption({ class: 'text-xs text-ink-muted' }, [
+              '照片：',
+              ui.a(
+                { href: detail.photoCredit.sourceUrl, class: 'underline underline-offset-2 hover:text-ink' },
+                [detail.photoCredit.author],
+              ),
+              `／${detail.photoCredit.license}／Wikimedia Commons`,
+            ]),
+        ]),
     ]),
     ui.div({ class: 'grid gap-6 lg:grid-cols-2' }, [
       detailBlock(

@@ -1,0 +1,506 @@
+{
+  "cabbage": {
+    "file": "Cabbage.jpg",
+    "author": "Bill Tarpenning",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Cabbage.jpg"
+  },
+  "napa": {
+    "file": "BrassicaPekinensis.jpg",
+    "author": "Taken by Fanghong",
+    "license": "CC BY 2.5",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:BrassicaPekinensis.jpg"
+  },
+  "radish": {
+    "file": "Daikon.Japan.jpg",
+    "author": "Chris 73",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Daikon.Japan.jpg"
+  },
+  "cauliflower": {
+    "file": "A_Cauliflowers_in_Yuen_Long.jpg",
+    "author": "Peachyeung316",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:A_Cauliflowers_in_Yuen_Long.jpg"
+  },
+  "spinach": {
+    "file": "Spinach leaves kerala.jpg",
+    "author": "AswiniKP(Aswini Kumar P)",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Spinach_leaves_kerala.jpg"
+  },
+  "mustard": {
+    "file": "RoterSenfRedGiantBlatt.jpg",
+    "author": "Goldlocki",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:RoterSenfRedGiantBlatt.jpg"
+  },
+  "scallion": {
+    "file": "Scallions in supermarket - DSC04974-001.JPG",
+    "author": "Daderot",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Scallions_in_supermarket_-_DSC04974-001.JPG"
+  },
+  "carrot": {
+    "file": "13-08-31-wien-redaktionstreffen-EuT-by-Bi-frie-037.jpg",
+    "author": "Bi-frie (talk)",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:13-08-31-wien-redaktionstreffen-EuT-by-Bi-frie-037.jpg"
+  },
+  "pea": {
+    "file": "Snow peas.jpg",
+    "author": "Renee Comet (Photographer) / National Cancer Institute",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Snow_peas.jpg"
+  },
+  "celery": {
+    "file": "Snijselderij_Apium_graveolens.jpg",
+    "author": "Rasbak",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Snijselderij_Apium_graveolens.jpg"
+  },
+  "onion": {
+    "file": "Onions_in_Peng_Chau.jpg",
+    "author": "Peachyeung316",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Onions_in_Peng_Chau.jpg"
+  },
+  "garlic": {
+    "file": "Opened garlic bulb with garlic clove.jpg",
+    "author": "Dubravko Sorić SoraZG on Flickr",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Opened_garlic_bulb_with_garlic_clove.jpg"
+  },
+  "asparagus": {
+    "file": "Asparagus_plants_-_geograph.org.uk_-_552470.jpg",
+    "author": "Evelyn Simak",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Asparagus_plants_-_geograph.org.uk_-_552470.jpg"
+  },
+  "pumpkin": {
+    "file": "Cucurbita_pepo_small_edible_mini_baby_pumpkins.jpg",
+    "author": "Ginny from USA",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Cucurbita_pepo_small_edible_mini_baby_pumpkins.jpg"
+  },
+  "bamboo": {
+    "file": "Boldhamii Shoots Sliced.PNG",
+    "author": "Pdeitiker at English Wikipedia",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Boldhamii_Shoots_Sliced.PNG"
+  },
+  "loofah": {
+    "file": "Luffa_aegyptica.jpg",
+    "author": "‘Uncle Carl’ (カールおじさん).",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Luffa_aegyptica.jpg"
+  },
+  "water-spinach": {
+    "file": "N_Ipoa_D1600.JPG",
+    "author": "Eric Guinther",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:N_Ipoa_D1600.JPG"
+  },
+  "sweet-potato-leaf": {
+    "file": "Sweet_Potato_Leaf,_Taichung,_Taiwan_02.jpg",
+    "author": "FireFeather",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Sweet_Potato_Leaf,_Taichung,_Taiwan_02.jpg"
+  },
+  "eggplant": {
+    "file": "Solanum_melongena_24_08_2012_(1).JPG",
+    "author": "Joydeep",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Solanum_melongena_24_08_2012_(1).JPG"
+  },
+  "bitter-gourd": {
+    "file": "Taiwan_2009_Tainan_City_Organic_Farm_Bitter_Gourd_FRD_7956.jpg",
+    "author": "Fred Hsu (Wikipedia:User:Fred Hsu on en.wikipedia)",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Taiwan_2009_Tainan_City_Organic_Farm_Bitter_Gourd_FRD_7956.jpg"
+  },
+  "wax-gourd": {
+    "file": "冬瓜果實.jpg",
+    "author": "氏子",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:%E5%86%AC%E7%93%9C%E6%9E%9C%E5%AF%A6.jpg"
+  },
+  "okra": {
+    "file": "Hong_Kong_Okra_Aug_25_2012.JPG",
+    "author": "Earth100",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Hong_Kong_Okra_Aug_25_2012.JPG"
+  },
+  "lotus-root": {
+    "file": "Lotus_root.jpg",
+    "author": "FotoosRobin",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lotus_root.jpg"
+  },
+  "water-bamboo": {
+    "file": "Peeled wild rice stem - Jiaobai.jpg",
+    "author": "Fumikas Sagisavas",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Peeled_wild_rice_stem_-_Jiaobai.jpg"
+  },
+  "taro": {
+    "file": "Taro corms 2.jpg",
+    "author": "Unknown",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Taro_corms_2.jpg"
+  },
+  "water-caltrop": {
+    "file": "Water-caltrops.jpg",
+    "author": "Unknown",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Water-caltrops.jpg"
+  },
+  "sweet-corn": {
+    "file": "Starr-120625-7599-Zea mays-Ilini Xtra Sweet ears ready to eat-Olinda-Maui (24889896610).jpg",
+    "author": "Forest and Kim Starr",
+    "license": "CC BY 3.0 us",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0/us/deed.en",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Starr-120625-7599-Zea_mays-Ilini_Xtra_Sweet_ears_ready_to_eat-Olinda-Maui_(24889896610).jpg"
+  },
+  "edamame": {
+    "file": "Edamame_by_Zesmerelda_in_Chicago.jpg",
+    "author": "Tammy Green (aka Zesmerelda) from Chicago Upscale Dining + Lounge Republic Pan-Asian Restaurant [1] in Ontario &amp; Rush Street, Chicago, Illinois 60611",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Edamame_by_Zesmerelda_in_Chicago.jpg"
+  },
+  "bell-pepper": {
+    "file": "Green,_yellow_and_red_bell_peppers.jpg",
+    "author": "Peachyeung316",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Green,_yellow_and_red_bell_peppers.jpg"
+  },
+  "arrow-bamboo": {
+    "file": "The newly harvested bamboo shoots after removing the outer sheaths for the making of Ushoi (ꯎꯁꯣꯏ) - a traditional Meitei ethnic food derived from bamboo shoots.jpg",
+    "author": "P. Nongdam and Leimapokpam Tikendra",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_newly_harvested_bamboo_shoots_after_removing_the_outer_sheaths_for_the_making_of_Ushoi_(%EA%AF%8E%EA%AF%81%EA%AF%A3%EA%AF%8F)_-_a_traditional_Meitei_ethnic_food_derived_from_bamboo_shoots.jpg"
+  },
+  "lettuce": {
+    "file": "Iceberg lettuce (IJssla krop).jpg",
+    "author": "Rasbak 13:13, 20 May 2007 (UTC)",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Iceberg_lettuce_(IJssla_krop).jpg"
+  },
+  "cucumber": {
+    "file": "Kurkkuja.jpg",
+    "author": "Photo taken by Muu-karhu",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Kurkkuja.jpg"
+  },
+  "mushroom": {
+    "file": "Lentinula edodes.jpg",
+    "author": "Eric Steinert",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lentinula_edodes.jpg"
+  },
+  "chili": {
+    "file": "Madame_Jeanette_and_other_chillies.jpg",
+    "author": "Takeaway",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Madame_Jeanette_and_other_chillies.jpg"
+  },
+  "daylily": {
+    "file": "Hemerocallis_citrina_hémérocalle.jpg",
+    "author": "This illustration was made by Citron You must credit this : Citron / CC-BY-SA-3.0",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Hemerocallis_citrina_h%C3%A9m%C3%A9rocalle.jpg"
+  },
+  "yardlong-bean": {
+    "file": "Long_beans.jpg",
+    "author": "Paul Goyette",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Long_beans.jpg"
+  },
+  "ma-bamboo": {
+    "file": "A Bamboo shoots at Vegetable Market in Yuen Long.jpg",
+    "author": "Peachyeung316",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:A_Bamboo_shoots_at_Vegetable_Market_in_Yuen_Long.jpg"
+  },
+  "orange": {
+    "file": "OrangeBloss_wb.jpg",
+    "author": "Ellen Levy Finch (Elf)",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:OrangeBloss_wb.jpg"
+  },
+  "ponkan": {
+    "file": "Mandarin Oranges (Citrus Reticulata).jpg",
+    "author": "Joe Ravi",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mandarin_Oranges_(Citrus_Reticulata).jpg"
+  },
+  "tankan": {
+    "file": "Citrus_tankan.jpg",
+    "author": "sirooziya",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Citrus_tankan.jpg"
+  },
+  "strawberry": {
+    "file": "Strawberry_is_a_fruit_instead_of_love_(6).jpg",
+    "author": "PEAK99",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Strawberry_is_a_fruit_instead_of_love_(6).jpg"
+  },
+  "wax-apple": {
+    "file": "Lainwu_(Wax_apple)_WP_001223.jpg",
+    "author": "Taiwan7007",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lainwu_(Wax_apple)_WP_001223.jpg"
+  },
+  "cherry-tomato": {
+    "file": "Tomato_je.jpg",
+    "author": "Softeis",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Tomato_je.jpg"
+  },
+  "jujube": {
+    "file": "Ziziphus_mauritiana_fruit_2.jpg",
+    "author": "Ethel Aardvark",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ziziphus_mauritiana_fruit_2.jpg"
+  },
+  "loquat": {
+    "file": "Eriobotrya_japonica2.jpg",
+    "author": "Unknown",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Eriobotrya_japonica2.jpg"
+  },
+  "mulberry": {
+    "file": "Morus_alba_fruits_and_leaves.jpg",
+    "author": "Andre Abrahami",
+    "license": "CC BY-SA 2.5",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Morus_alba_fruits_and_leaves.jpg"
+  },
+  "plum": {
+    "file": "Prunus mume f. pleiocarpa (fruit).jpg",
+    "author": "Neux-Neux",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Prunus_mume_f._pleiocarpa_(fruit).jpg"
+  },
+  "pineapple": {
+    "file": "Pineapple_Oahu.jpg",
+    "author": "Unknown",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Pineapple_Oahu.jpg"
+  },
+  "prune": {
+    "file": "Plums_hanging.jpg",
+    "author": "Fir0002 at English Wikipedia",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Plums_hanging.jpg"
+  },
+  "mango": {
+    "file": "Xoài_ở_Nam_Việt_Nam..jpg",
+    "author": "Bùi Thụy Đào Nguyên",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Xo%C3%A0i_%E1%BB%9F_Nam_Vi%E1%BB%87t_Nam..jpg"
+  },
+  "lychee": {
+    "file": "Litchi_chinensis_Luc_Viatour.jpg",
+    "author": "Luc Viatour",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Litchi_chinensis_Luc_Viatour.jpg"
+  },
+  "watermelon": {
+    "file": "Watermelon-garden.jpg",
+    "author": "Kumon",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Watermelon-garden.jpg"
+  },
+  "grape": {
+    "file": "巨峰.jpg",
+    "author": "GGGLS",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:%E5%B7%A8%E5%B3%B0.jpg"
+  },
+  "passion-fruit": {
+    "file": "Passiflora Edulis Open Fruit2.jpg",
+    "author": "Alexander Klink",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Passiflora_Edulis_Open_Fruit2.jpg"
+  },
+  "dragon-fruit": {
+    "file": "Pitaya_cross_section_ed2.jpg",
+    "author": "SMasters",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Pitaya_cross_section_ed2.jpg"
+  },
+  "longan": {
+    "file": "Dimocarpus_longan_fruits.jpg",
+    "author": "Unknown",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Dimocarpus_longan_fruits.jpg"
+  },
+  "lemon": {
+    "file": "Lemon.jpg",
+    "author": "André Karwath aka Aka",
+    "license": "CC BY-SA 2.5",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lemon.jpg"
+  },
+  "pear": {
+    "file": "Asian.pear-Pyrus.pyrifolia-05.jpg",
+    "author": "by advencap",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Asian.pear-Pyrus.pyrifolia-05.jpg"
+  },
+  "avocado": {
+    "file": "Persea_americana_fruit_2.JPG",
+    "author": "B.navez",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Persea_americana_fruit_2.JPG"
+  },
+  "sugar-apple": {
+    "file": "Annona_squamosa_fruit.jpg",
+    "author": "Ruy Carvalho",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Annona_squamosa_fruit.jpg"
+  },
+  "persimmon": {
+    "file": "Fuyu_persimmon_fruits,_one_cut_open.jpg",
+    "author": "Frank Schulenburg",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Fuyu_persimmon_fruits,_one_cut_open.jpg"
+  },
+  "starfruit": {
+    "file": "Averrhoa_carambola_ARS_k5735-7.jpg",
+    "author": "Unknown",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Averrhoa_carambola_ARS_k5735-7.jpg"
+  },
+  "banana": {
+    "file": "Bunch of bananas on sale.jpg",
+    "author": "Wilfredor",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Bunch_of_bananas_on_sale.jpg"
+  },
+  "guava": {
+    "file": "Psidium_guajava_fruit.jpg",
+    "author": "Unknown",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Psidium_guajava_fruit.jpg"
+  },
+  "papaya": {
+    "file": "Carica papaya - papaya - var-tropical dwarf papaya - desc-fruit.jpg",
+    "author": "Phyzome is Tim McCormack",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Carica_papaya_-_papaya_-_var-tropical_dwarf_papaya_-_desc-fruit.jpg"
+  },
+  "coconut": {
+    "file": "Tender coconut for sale.jpeg",
+    "author": "User:Tshrinivasan",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Tender_coconut_for_sale.jpeg"
+  },
+  "peach": {
+    "file": "Hillview Farms peaches in a basket.jpg",
+    "author": "Tomwsulcer",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Hillview_Farms_peaches_in_a_basket.jpg"
+  },
+  "honey-peach": {
+    "file": "Autumn Red peaches.jpg",
+    "author": "Jack Dykinga, USDA",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Autumn_Red_peaches.jpg"
+  },
+  "melon": {
+    "file": "Muskmelon.jpg",
+    "author": "Seth Vidal",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Muskmelon.jpg"
+  },
+  "grapefruit": {
+    "file": "Grapefruits_-_whole-halved-segments.jpg",
+    "author": "Ivar Leidus",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Grapefruits_-_whole-halved-segments.jpg"
+  },
+  "apple": {
+    "file": "Apples_in_basket_2018_G2.jpg",
+    "author": "George Chernilevsky",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Apples_in_basket_2018_G2.jpg"
+  },
+  "kumquat": {
+    "file": "Heidi kumquat.JPG",
+    "author": "The original uploader was Matttemp at English Wikipedia.",
+    "license": "CC BY-SA 2.5",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Heidi_kumquat.JPG"
+  }
+}
