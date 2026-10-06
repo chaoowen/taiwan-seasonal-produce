@@ -45,6 +45,7 @@ npm run dev      # 開發伺服器：http://127.0.0.1:3000
 | ---- | ---- |
 | `npm run dev` | 開發伺服器（含 Hozu DevTools，可在頁面上選取元素提出修改） |
 | `npm run check` | 型別與 Hozu 規則檢查，提交前請先跑過 |
+| `npm test` | 核心規則與各頁面的測試（`tests/`，約 1 秒，不呼叫農業部 API） |
 | `npm start` | 正式模式啟動（Node） |
 | `npm run build` | 建置（Node） |
 | `npm run sync:catalog` | 從農糧署開放資料更新 `data/afa-peak-season.json`（每週自動執行並開 PR） |
@@ -106,9 +107,11 @@ scripts/
   check-pages.ts      檢查線上重要頁面（每 3 小時 workflow 使用）
   price-snapshot.ts   產生價格快照（農業部失敗時寫入「無價格」快照，不擋部署）
   build-worker.ts     以 esbuild＋Hozu 外掛打包 Worker
+tests/            node:test 測試：盛產規則、交易量盛產月、推薦與篩選、走勢線、各頁面（狀態碼、h1、404）
 wrangler.jsonc     Cloudflare 設定
-.github/workflows/deploy.yml        自動部署
-.github/workflows/sync-catalog.yml  每週同步開放資料與交易量，有變動就開 PR
+.github/workflows/check.yml         每個 PR 跑 `hozu check` 與測試
+.github/workflows/deploy.yml        自動部署（部署前同樣先跑檢查與測試）
+.github/workflows/sync-catalog.yml  每週同步開放資料與交易量，有變動就開 PR，並在 PR 留言回報檢查與測試結果
 .github/workflows/price-watch.yml   每日檢查價格是否過期，過期就開 issue、恢復就關閉
 .github/workflows/pages-watch.yml   每 3 小時檢查重要頁面（狀態碼、內容、回應時間），異常就開 issue、恢復就關閉
 hozu.lock.json     Hozu 記錄的端點與轉換（`hozu check --update-lock` 更新）
@@ -168,6 +171,13 @@ flowchart LR
 - **手動部署**：`npx wrangler login` 後執行 `npm run deploy`。
 - **為什麼打包要自己做**：Worker 需要以 Hozu 的 esbuild 外掛（`@hozu/transform/esbuild`）打包，它會替每個檔案填入自己的 `import.meta.url`（workerd 沒有），元件和樣式靠它找到建置產物。`worker/index.ts` 直接使用 `hozu build` 的 `dist/manifest.json`。
 - **曾經的繞道做法（已移除）**：Hozu 0.17–0.20.1 以函式文字當作元件指紋，打包後 Worker 會因「建置紀錄不符」拒絕啟動，所以曾經自己校正雜湊、替換 `@hozu/bundle`。我們回報的 [olevatorr/Hozu#1](https://github.com/olevatorr/Hozu/issues/1) 已在 **0.20.2** 修正，這些程式碼已經刪除。
+
+## 測試
+
+- `npm test` 以 Node 內建的 `node:test` 執行（`--import @hozu/transform/register` 載入 Hozu 轉換，頁面測試用 `@hozu/testing` 的 `testApp`）。
+- 價格一律用測試裡的固定快照，不呼叫農業部 API，所以結果穩定、約 1 秒跑完。
+- 測試的是規則而不是資料數值（例如「盛產月一定在當季內」「人工盛產月優先於交易量」），每月更新的資料不會讓測試失效；規則被改壞時會失敗。
+- 每週資料同步由 GitHub Actions 自己開 PR，這種 PR 不會觸發 `check.yml`，所以同步流程會自己跑檢查，並把結果留言在 PR 上。
 
 ## 品項照片
 

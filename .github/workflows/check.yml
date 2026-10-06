@@ -1,0 +1,24 @@
+# Checks every pull request: Hozu rules and types, then the tests (core rules and every page).
+# Pull requests opened by the weekly sync (GITHUB_TOKEN) don't trigger this; sync-catalog.yml runs the same steps.
+name: Check
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+      - run: npx hozu check
+      - run: npm test
