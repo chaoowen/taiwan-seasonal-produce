@@ -1,6 +1,7 @@
-# Weekly check of the AFA open dataset 每月盛產農產品產地. When data/afa-peak-season.json changes, it opens a
-# pull request for review instead of changing the site directly (the data is updated irregularly and new
-# crops may need a profile in features/produce/crop-profiles.ts).
+# Weekly check of the AFA open dataset 每月盛產農產品產地 and the MOA trading volume. When anything in data/
+# changes, it opens a pull request for review instead of changing the site directly: the AFA data is updated
+# irregularly and new crops may need a profile in features/produce/crop-profiles.ts, and the volume (refetched
+# once a month, when its 12-month window moves) can change the peak months of items without a curated peak.
 name: Sync open-data catalog
 
 on:
@@ -16,7 +17,7 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
@@ -24,8 +25,14 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      # The sync script only uses Node built-ins, so no npm install is needed.
+      # The sync scripts only use Node built-ins, so no npm install is needed.
       - run: node scripts/sync-catalog.ts
+
+      # Does nothing unless a new month has ended; then ~730 requests to the MOA API.
+      - run: node scripts/sync-volume.ts
+
+      # Keep the report in step with the data, so the pull request shows the peak months that change.
+      - run: node scripts/compare-peaks.ts
 
       - name: Open a pull request if the data changed
         env:
@@ -35,11 +42,12 @@ jobs:
             echo "Open data unchanged."
             exit 0
           fi
-          branch="data/afa-sync-$(date -u +%Y%m%d)"
+          branch="data/open-data-sync-$(date -u +%Y%m%d)"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$branch"
-          git commit -am "data: sync AFA peak-season dataset ($(date -u +%Y-%m-%d))"
+          git add data/ docs/
+          git commit -m "data: sync open data ($(date -u +%Y-%m-%d))"
           git push --force -u origin "$branch"
           if [ -n "$(gh pr list --head "$branch" --json number --jq '.[].number')" ]; then
             echo "A pull request for $branch already exists."
@@ -48,5 +56,5 @@ jobs:
           # Needs Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests";
           # without it this step fails, and GitHub emails the failure.
           gh pr create --base main --head "$branch" \
-            --title "data: AFA peak-season dataset changed ($(date -u +%Y-%m-%d))" \
-            --body "Weekly sync of 每月盛產農產品產地. Review the diff of data/afa-peak-season.json: new crops appear on the site without a picking tip until they get a profile in features/produce/crop-profiles.ts."
+            --title "data: open data changed ($(date -u +%Y-%m-%d))" \
+            --body "Weekly sync of 每月盛產農產品產地 and the MOA trading volume. In data/afa-peak-season.json, new crops appear on the site without a picking tip until they get a profile in features/produce/crop-profiles.ts. In data/moa-monthly-volume.json, check docs/phase-b-peak-comparison.md for the peak months of items without a curated peak."

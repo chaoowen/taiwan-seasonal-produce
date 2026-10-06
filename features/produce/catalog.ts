@@ -1,5 +1,6 @@
 import afaData from '../../data/afa-peak-season.json' with { type: 'json' }
 import { CROP_PROFILES, type CropProfile } from './crop-profiles.ts'
+import { getVolumePeaks } from './volume-peaks.ts'
 
 type Kind = 'vegetable' | 'fruit'
 
@@ -10,7 +11,10 @@ export interface CatalogItem {
   origin: string
   /** Months (1–12) the item is in season (AFA peak-season months, or kept by hand). */
   months: number[]
-  /** Peak months: cheapest and best quality, so we recommend buying it. */
+  /**
+   * Peak months: cheapest and best quality, so we recommend buying it. From the curated list or the AFA
+   * places; items left without one take their MOA trading-volume peaks (see withVolumePeak).
+   */
   peak: number[]
   /** Null for crops the open data added that have no hand-written profile yet. */
   tip: string | null
@@ -44,7 +48,7 @@ function peakFromPlaces(placesByMonth: Record<string, number>): number[] {
 }
 
 /**
- * `peak` undefined: derive it from places. `peak: []`: deliberately none (e.g. bananas, all year).
+ * `peak` undefined: derive it from places. `peak: []`: none from places (e.g. bananas, all year).
  * Curated months outside the AFA season are dropped; if none are left, fall back to places.
  */
 function choosePeak(curated: number[] | undefined, months: number[], placesByMonth: Record<string, number>): number[] {
@@ -97,6 +101,16 @@ function fromUnprofiledCrop(crop: AfaCrop): CatalogItem {
   }
 }
 
+/**
+ * Items with no peak from the curated list or the AFA places take the months their MOA trading volume
+ * peaks, kept only inside their season: storable crops (onion, taro) sell from cold storage after harvest,
+ * so volume alone isn't a harvest peak. Items that already have a peak keep it.
+ */
+function withVolumePeak(item: CatalogItem): CatalogItem {
+  if (item.peak.length > 0) return item
+  return { ...item, peak: getVolumePeaks(item.id).filter((month) => item.months.includes(month)) }
+}
+
 const profiledAfaNames = new Set(CROP_PROFILES.flatMap((profile) => profile.afa ?? profile.supersedes ?? []))
 
 /**
@@ -109,4 +123,4 @@ export const CATALOG: CatalogItem[] = [
     return item ? [item] : []
   }),
   ...[...AFA_CROPS.values()].filter((crop) => !profiledAfaNames.has(crop.crop)).map(fromUnprofiledCrop),
-]
+].map(withVolumePeak)
