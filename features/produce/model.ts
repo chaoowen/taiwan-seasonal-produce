@@ -56,7 +56,10 @@ export const Today = z.object({
   priceStatus: PriceStatus,
   /** Latest MOA trading day, e.g. "10/5"; null unless `priceStatus` is `ok`. */
   priceDateLabel: z.string().nullable(),
+  /** The best recommended buys (at most 8), best first. */
   picks: z.array(Produce),
+  /** The remaining recommended buys, shown under 看更多. */
+  morePicks: z.array(Produce),
   vegetables: z.array(Produce),
   fruits: z.array(Produce),
 })

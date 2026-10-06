@@ -182,8 +182,8 @@ const picksSection = part((today: TodayData) =>
       ui.div({ class: 'space-y-1' }, [
         ui.p({ class: 'text-base text-ink' }, [
           today.priceStatus === 'ok'
-            ? `${today.monthLabel}・${today.monthSeasonLabel}｜${today.picks.length} 項：正值盛產，或批發價比近 30 天便宜 10% 以上`
-            : `${today.monthLabel}・${today.monthSeasonLabel}｜${today.picks.length} 項正值盛產，價格實惠、品質最好`,
+            ? `${today.monthLabel}・${today.monthSeasonLabel}｜精選 ${today.picks.length} 項：依便宜幅度與盛產排序`
+            : `${today.monthLabel}・${today.monthSeasonLabel}｜精選 ${today.picks.length} 項正值盛產，價格實惠、品質最好`,
         ]),
         priceNote(today),
       ]),
@@ -194,6 +194,20 @@ const picksSection = part((today: TodayData) =>
             : '沒有符合篩選條件的品項，可以在篩選欄選「全部」看完整清單。',
         ]),
       ui.ul({ class: cardGrid }, [ui.each(today.picks, 'id', (item) => pickCard(item))]),
+      today.morePicks.length > 0 &&
+        ui.details({ class: 'group space-y-5' }, [
+          ui.summary(
+            {
+              class:
+                'inline-flex min-h-11 cursor-pointer list-none items-center gap-1.5 text-base font-medium text-brand-strong decoration-2 underline-offset-8 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand [&::-webkit-details-marker]:hidden',
+            },
+            [
+              ui.span({ class: 'group-open:hidden' }, [`看更多 ${today.morePicks.length} 項`]),
+              ui.span({ class: 'hidden group-open:inline' }, ['收起']),
+            ],
+          ),
+          ui.ul({ class: cardGrid }, [ui.each(today.morePicks, 'id', (item) => pickCard(item))]),
+        ]),
     ]),
   ]),
 )
