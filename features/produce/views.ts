@@ -153,8 +153,8 @@ const sectionHeading = part((title: string, subtitle: string) =>
 const cardGrid = 'grid gap-5 sm:grid-cols-2 xl:grid-cols-3'
 const smallCardGrid = 'grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4'
 
-const listSection = part((title: string, subtitle: string, info: string, items: Item[]) =>
-  ui.section({ class: sectionShell }, [
+const listSection = part((id: string, title: string, subtitle: string, info: string, items: Item[]) =>
+  ui.section({ id, class: sectionShell }, [
     sectionHeading(title, subtitle),
     ui.div({ class: 'space-y-6' }, [
       ui.p({ class: 'text-sm text-ink-muted' }, [info]),
@@ -176,7 +176,7 @@ const priceNote = part((today: TodayData) =>
 )
 
 const picksSection = part((today: TodayData) =>
-  ui.section({ class: sectionShell }, [
+  ui.section({ id: 'picks', class: sectionShell }, [
     sectionHeading('當月建議購買', '盛產又划算的好選擇'),
     ui.div({ class: 'space-y-6' }, [
       ui.div({ class: 'space-y-1' }, [
@@ -198,7 +198,8 @@ const picksSection = part((today: TodayData) =>
   ]),
 )
 
-const sectionShell = 'grid gap-6 border-t border-line pt-10 md:grid-cols-[auto_1fr] md:gap-12'
+const sectionShell =
+  'grid scroll-mt-(--section-offset) gap-6 border-t border-line pt-10 md:grid-cols-[auto_1fr] md:gap-12'
 
 const searchResults = part((result: z.infer<typeof ProduceSearch>) =>
   ui.section({ 'aria-live': 'polite', class: sectionShell }, [
@@ -247,7 +248,7 @@ const navLink = part((label: string, href: ReturnType<typeof ui.link>, isCurrent
       'aria-current': isCurrent ? 'page' : 'false',
       // Text links: an underline on hover, and a fixed one on the current page (styled through aria-current).
       class:
-        'inline-flex min-h-11 items-center px-1 text-base font-medium text-brand-strong underline-offset-8 decoration-2 transition-colors duration-200 hover:underline active:text-brand aria-[current=page]:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+        'inline-flex min-h-11 items-center whitespace-nowrap px-1 text-base font-medium text-brand-strong underline-offset-8 decoration-2 transition-colors duration-200 hover:underline active:text-brand aria-[current=page]:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
     },
     [label],
   ),
@@ -255,16 +256,17 @@ const navLink = part((label: string, href: ReturnType<typeof ui.link>, isCurrent
 
 /** Site title (links home) and the page navigation, fixed to the top of every page. */
 const siteHeader = part((page: PageName) =>
-  ui.div({ class: 'fixed inset-x-0 top-0 z-40 border-b border-line bg-canvas/95 backdrop-blur-sm' }, [
-    ui.div({ class: 'mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-3 sm:px-6' }, [
+  ui.div({ class: 'fixed inset-x-0 top-0 z-40 h-(--header-height) border-b border-line bg-canvas/95 backdrop-blur-sm' }, [
+    ui.div({ class: 'mx-auto flex h-full max-w-6xl items-center justify-between gap-3 px-3 min-[360px]:px-4 sm:px-6' }, [
     ui.a({ href: ui.link(home, null), class: 'rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand' }, [
-      ui.p({ class: 'flex items-center gap-3 font-serif text-2xl font-bold text-brand-strong sm:text-3xl' }, [
-        sproutIcon(),
+      ui.p({ class: 'flex items-center gap-2 font-serif text-xl font-bold whitespace-nowrap text-brand-strong sm:gap-3 sm:text-3xl' }, [
+        // The icon gives way on the narrowest phones so the header stays on one line.
+        ui.span({ class: 'max-[374px]:hidden' }, [sproutIcon()]),
         '台灣當季蔬果',
       ]),
     ]),
     ui.nav({ 'aria-label': '網站導覽' }, [
-      ui.ul({ class: 'flex gap-5' }, [
+      ui.ul({ class: 'flex gap-3 sm:gap-5' }, [
         ui.li({}, [navLink('首頁', ui.link(home, null), page === 'home')]),
         ui.li({}, [navLink('搜尋', ui.link(searchPage, null), page === 'search')]),
         ui.li({}, [navLink('我的收藏', ui.link(favoritesPage, null), page === 'favorites')]),
@@ -355,6 +357,36 @@ const searchForm = part((q: string | null) =>
   ]),
 )
 
+const sectionTab = part((label: string, href: string) =>
+  ui.li({}, [
+    ui.a(
+      {
+        href,
+        class:
+          'inline-flex min-h-11 items-center whitespace-nowrap px-1 text-base font-medium text-brand-strong decoration-2 underline-offset-8 transition-colors duration-200 hover:underline active:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+      },
+      [label],
+    ),
+  ]),
+)
+
+/** Jump links to the three sections; sticks under the fixed header once scrolled up to it (CSS only). */
+const sectionTabs = part(() =>
+  ui.nav(
+    {
+      'aria-label': '頁面區塊',
+      class: 'sticky top-(--header-height) z-30 -mx-4 border-b border-line bg-canvas/95 px-4 backdrop-blur-sm sm:-mx-6 sm:px-6',
+    },
+    [
+      ui.ul({ class: 'flex gap-6 overflow-x-auto' }, [
+        sectionTab('當月建議購買', '#picks'),
+        sectionTab('當季蔬菜', '#vegetables'),
+        sectionTab('當季水果', '#fruits'),
+      ]),
+    ],
+  ),
+)
+
 /** 篩選欄: plain links like the month chips, so the filter is in the URL and needs no JavaScript. */
 const filterChip = part((option: z.infer<typeof ShowOption>, month: number | null) =>
   ui.li({}, [
@@ -388,8 +420,8 @@ const filterBar = part((today: TodayData, month: number | null) =>
 
 // ---- Pages ----
 
-/** pt-32 / sm:pt-28 leave room for the fixed header (it wraps to two lines on phones). */
-const pageMain = 'mx-auto max-w-6xl px-4 pt-32 pb-10 sm:px-6 sm:pt-28 sm:pb-14'
+/** The top padding leaves room for the fixed header (one line, --header-height, at every width). */
+const pageMain = 'mx-auto max-w-6xl px-4 pt-[calc(var(--header-height)+2rem)] pb-10 sm:px-6 sm:pb-14'
 
 const footerNote = part(() =>
   ui.p({ class: 'border-t border-line pt-6 text-sm text-ink-muted' }, [
@@ -409,10 +441,11 @@ export const Home = ui.view({
         ready: (today) =>
           ui.div({ class: 'space-y-12' }, [
             ui.header({ class: 'space-y-6' }, [siteHeader('home'), dateCard(today), monthNav(today), searchForm(null)]),
+            sectionTabs(),
             filterBar(today, search.month),
             picksSection(today),
-            listSection('當季蔬菜', '本月盛產的時令蔬菜', `${today.monthLabel}・共 ${today.vegetables.length} 項`, today.vegetables),
-            listSection('當季水果', '本月盛產的時令水果', `${today.monthLabel}・共 ${today.fruits.length} 項`, today.fruits),
+            listSection('vegetables', '當季蔬菜', '本月盛產的時令蔬菜', `${today.monthLabel}・共 ${today.vegetables.length} 項`, today.vegetables),
+            listSection('fruits', '當季水果', '本月盛產的時令水果', `${today.monthLabel}・共 ${today.fruits.length} 項`, today.fruits),
             footerNote(),
           ]),
         failed: { Unexpected: () => unavailable('暫時無法取得當季資料，請稍後再試。') },
