@@ -69,13 +69,17 @@ export const Today = z.object({
   fruits: z.array(Produce),
 })
 
-// The date decides the list, so every request reads it fresh (in Asia/Taipei time).
+/**
+ * Public queries are cached for 5 minutes (ISR): prices only change with a deploy, and the Taiwan date
+ * turns at midnight, so a page may show the previous day for at most 5 minutes after it.
+ */
+const FIVE_MINUTES = { revalidate: 300 } as const
 export const getToday = query({
   /** `month: null` (or anything outside 1–12, e.g. a hand-edited URL) means the current month in Taiwan. */
   input: z.object({ month: z.number().nullable(), show: Show }),
   output: Today,
   scope: 'public',
-  freshness: 'request',
+  freshness: FIVE_MINUTES,
   runs: 'server',
 })
 
@@ -97,7 +101,7 @@ export const searchProduce = query({
   input: z.object({ q: z.string() }),
   output: ProduceSearch,
   scope: 'public',
-  freshness: 'request',
+  freshness: FIVE_MINUTES,
   runs: 'server',
 })
 
@@ -106,7 +110,7 @@ export const listCatalog = query({
   input: z.object({}),
   output: z.array(SearchResult),
   scope: 'public',
-  freshness: 'request',
+  freshness: FIVE_MINUTES,
   runs: 'server',
 })
 
@@ -147,6 +151,6 @@ export const getProduceDetail = query({
   output: ProduceDetail,
   errors: { NotFound: z.object({ id: z.string() }) },
   scope: 'public',
-  freshness: 'request',
+  freshness: FIVE_MINUTES,
   runs: 'server',
 })
