@@ -1,7 +1,7 @@
 import type { CatalogItem } from './catalog.ts'
 import { MARKET_NAMES, matchesMarketName } from './market-names.ts'
 import { getTradeRows, type TradeRow, type TradeType } from './moa-client.ts'
-import { formatRocDate, getRocDate } from './taipei-date.ts'
+import { formatRocDate, getRocDate, rocToIsoDate } from './taipei-date.ts'
 
 /** The baseline the latest price is compared with. */
 const WINDOW_DAYS = 30
@@ -22,6 +22,8 @@ export interface ItemPrice {
 export interface PriceSummary {
   /** Latest day with any trades, e.g. "10/4". */
   tradeDateLabel: string
+  /** The same latest trading day as an ISO date, e.g. "2026-10-04" (for freshness checks). */
+  tradeDate: string
   prices: Map<string, ItemPrice>
 }
 
@@ -89,7 +91,7 @@ async function loadSummary(items: CatalogItem[], now: Date): Promise<PriceSummar
     const itemPrice = getItemPrice(item, days)
     if (itemPrice) prices.set(item.id, itemPrice)
   })
-  return { tradeDateLabel: formatRocDate(latestDay.rocDate), prices }
+  return { tradeDateLabel: formatRocDate(latestDay.rocDate), tradeDate: rocToIsoDate(latestDay.rocDate), prices }
 }
 
 /**

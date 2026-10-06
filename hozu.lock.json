@@ -1,0 +1,15 @@
+{
+  "features": {},
+  "pages": {
+    "access": {},
+    "endpoints": {
+      "produce.getStatus": {
+        "failed": {},
+        "mode": "json"
+      }
+    },
+    "head": {},
+    "redirects": {}
+  },
+  "version": 2
+}
