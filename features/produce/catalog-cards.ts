@@ -24,7 +24,7 @@ function getSeasonText(months: number[]): string {
 }
 
 /** Prices for `items`, or none when the MOA data is unavailable (cards then simply show no price). */
-export async function loadPrices(items: CatalogItem[]): Promise<Map<string, ItemPrice>> {
+async function loadPrices(items: CatalogItem[]): Promise<Map<string, ItemPrice>> {
   if (items.length === 0) return new Map()
   try {
     return (await getPriceSummary(items)).prices
@@ -35,7 +35,7 @@ export async function loadPrices(items: CatalogItem[]): Promise<Map<string, Item
 }
 
 /** One catalog item as a card: its produce fields for `month`, plus season text and whether it's in season. */
-export function toCatalogCard(item: CatalogItem, month: number, prices: Map<string, ItemPrice>) {
+function toCatalogCard(item: CatalogItem, month: number, prices: Map<string, ItemPrice>) {
   return {
     ...toProduce(item, month, prices.get(item.id) ?? null),
     seasonText: getSeasonText(item.months),
