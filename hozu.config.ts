@@ -2,10 +2,10 @@ import { project, ui } from '@hozu/core'
 import { zodAdapter } from '@hozu/schema-zod'
 import { produce } from './features/produce/feature.ts'
 import { getProduceDetail, listCatalog } from './features/produce/model.ts'
-import { FavoritesPage, Home, ProducePage, SearchPage } from './features/produce/views.ts'
+import { FavoritesPage, Home, NotFoundPage, ProducePage, SearchPage } from './features/produce/views.ts'
 import { site } from './features/site/feature.ts'
 import { Home as DemoHome } from './features/site/views.ts'
-import { demo, favoritesPage, home, produceItem, searchPage } from './routes.ts'
+import { demo, favoritesPage, home, notFound, produceItem, searchPage } from './routes.ts'
 
 /** Home and search share card, re-rendered on every deploy by scripts/make-share-image.ts. */
 const SHARE_IMAGE = ui.asset(new URL('./assets/share.jpg', import.meta.url))
@@ -17,7 +17,8 @@ export default project({
   env: { files: ['.env', '.env.local'] },
   // The public origin: canonical links, Open Graph URLs and /sitemap.xml are built from it.
   site: { url: 'https://taiwan-seasonal-produce.chaoowen88.workers.dev', name: '台灣當季蔬果', lang: 'zh-Hant-TW' },
-  routes: { home, searchPage, favoritesPage, produceItem, demo },
+  routes: { home, searchPage, favoritesPage, produceItem, notFound, demo },
+  notFound,
   pages: [
     ui.page(home, {
       views: [Home],
@@ -53,6 +54,10 @@ export default project({
     ui.page(favoritesPage, {
       views: [FavoritesPage],
       head: { render: () => ({ title: '我的收藏｜台灣當季蔬果', noindex: true }) },
+    }),
+    ui.page(notFound, {
+      views: [NotFoundPage],
+      head: { render: () => ({ title: '找不到頁面｜台灣當季蔬果', noindex: true }) },
     }),
     ui.page(demo, { views: [DemoHome], head: { render: () => ({ title: 'Hozu 範本首頁', noindex: true }) } }),
   ],
