@@ -34,6 +34,13 @@
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Spinach_leaves_kerala.jpg"
   },
+  "crown-daisy": {
+    "file": "Tần ô.jpg",
+    "author": "By en:User:ChildofMidnight.",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:T%E1%BA%A7n_%C3%B4.jpg"
+  },
   "mustard": {
     "file": "RoterSenfRedGiantBlatt.jpg",
     "author": "Goldlocki",
@@ -152,6 +159,13 @@
     "license": "CC BY-SA 3.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Hong_Kong_Okra_Aug_25_2012.JPG"
+  },
+  "ginger": {
+    "file": "Young ginger (20240608).jpg",
+    "author": "Fumikas Sagisavas",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Young_ginger_(20240608).jpg"
   },
   "lotus-root": {
     "file": "Lotus_root.jpg",
@@ -411,6 +425,13 @@
     "license": "CC BY-SA 3.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Persea_americana_fruit_2.JPG"
+  },
+  "pomelo": {
+    "file": "Pomelo fruit.jpg",
+    "author": "Ivar Leidus",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Pomelo_fruit.jpg"
   },
   "sugar-apple": {
     "file": "Annona_squamosa_fruit.jpg",

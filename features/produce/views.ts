@@ -1,6 +1,6 @@
 import { part, ui } from '@hozu/core'
 import type { z } from 'zod'
-import { favoritesPage, home, produceItem, searchPage } from '../../routes.ts'
+import { favoritesPage, home, notFound, produceItem, searchPage } from '../../routes.ts'
 import {
   appleIcon,
   calendarIcon,
@@ -199,11 +199,17 @@ const catalogCard = part((item: CatalogCard, isHidden: boolean) =>
 
 // ---- Section layout: vertical title on the left, items on the right, thin rules between ----
 
-/** 直排: a big vertical title with a smaller vertical subtitle; horizontal on narrow screens. */
-const sectionHeading = part((title: string, subtitle: string) =>
+const sectionTitleClass = 'font-serif text-4xl font-bold tracking-widest text-brand-strong md:vertical-rl md:text-6xl'
+
+/**
+ * 直排: a big vertical title with a smaller vertical subtitle; horizontal on narrow screens. `isPageTitle`
+ * makes it the page's h1 (pages whose only section names the page: search, favourites, not found).
+ */
+const sectionHeading = part((title: string, subtitle: string, isPageTitle: boolean) =>
   // Title 60px, subtitle 30px in the same serif; smaller below md so the horizontal title fits phones.
   ui.div({ class: 'flex flex-wrap items-baseline gap-x-3 gap-y-1 md:flex-nowrap md:items-start md:gap-3' }, [
-    ui.h2({ class: 'font-serif text-4xl font-bold tracking-widest text-brand-strong md:vertical-rl md:text-6xl' }, [title]),
+    isPageTitle && ui.h1({ class: sectionTitleClass }, [title]),
+    !isPageTitle && ui.h2({ class: sectionTitleClass }, [title]),
     // White by design choice; note it is only ~1.1:1 against the linen (below WCAG AA).
     ui.p({ class: 'font-serif text-xl tracking-widest text-white md:vertical-rl md:pt-3 md:text-3xl' }, [subtitle]),
   ]),
@@ -214,7 +220,7 @@ const smallCardGrid = 'grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4'
 
 const listSection = part((id: string, title: string, subtitle: string, info: string, items: Item[]) =>
   ui.section({ id, class: sectionShell }, [
-    sectionHeading(title, subtitle),
+    sectionHeading(title, subtitle, false),
     ui.div({ class: 'space-y-6' }, [
       ui.p({ class: 'text-sm text-ink-muted' }, [info]),
       items.length === 0 &&
@@ -236,7 +242,7 @@ const priceNote = part((today: TodayData) =>
 
 const picksSection = part((today: TodayData) =>
   ui.section({ id: 'picks', class: sectionShell }, [
-    sectionHeading('當月建議購買', '盛產又划算的好選擇'),
+    sectionHeading('當月建議購買', '盛產又划算的好選擇', false),
     ui.div({ class: 'space-y-6' }, [
       ui.div({ class: 'space-y-1' }, [
         ui.p({ class: 'text-base text-ink' }, [
@@ -279,7 +285,7 @@ const sectionShell =
 
 const searchResults = part((result: z.infer<typeof ProduceSearch>) =>
   ui.section({ 'aria-live': 'polite', class: sectionShell }, [
-    sectionHeading('搜尋結果', '找找挑選的訣竅'),
+    sectionHeading('搜尋結果', '找找挑選的訣竅', true),
     ui.div({ class: 'space-y-6' }, [
       ui.p({ class: 'text-base text-ink' }, [
         result.query === ''
@@ -296,7 +302,7 @@ const searchResults = part((result: z.infer<typeof ProduceSearch>) =>
 /** Every catalog card, hidden; FavoritesList's script shows the saved ones (or the empty message). */
 const favoritesSection = part((cards: CatalogCard[]) =>
   ui.section({ class: sectionShell }, [
-    sectionHeading('我的收藏', '收藏的時令好物'),
+    sectionHeading('我的收藏', '收藏的時令好物', true),
     ui.use(FavoritesList, { class: 'space-y-6' }, [
       ui.p({ class: 'text-base text-ink-muted', 'data-favorites-loading': '' }, [
         '收藏存在你的瀏覽器裡（localStorage），需要啟用 JavaScript 才能顯示。',
@@ -330,16 +336,24 @@ const navLink = part((label: string, href: ReturnType<typeof ui.link>, isCurrent
   ),
 )
 
-/** Site title (links home) and the page navigation, fixed to the top of every page. */
-const siteHeader = part((page: PageName) =>
+const siteTitleClass = 'flex items-center gap-2 font-serif text-xl font-bold whitespace-nowrap text-brand-strong sm:gap-3 sm:text-3xl'
+
+const siteTitle = () => [
+  // The icon gives way on the narrowest phones so the header stays on one line.
+  ui.span({ class: 'max-[374px]:hidden' }, [sproutIcon()]),
+  '台灣當季蔬果',
+]
+
+/**
+ * Site title (links home) and the page navigation, fixed to the top of every page. The title is the home
+ * page's h1 (`isTitleHeading`); other pages have their own (section title or item name).
+ */
+const siteHeader = part((page: PageName, isTitleHeading: boolean) =>
   ui.div({ class: 'fixed inset-x-0 top-0 z-40 h-(--header-height) border-b border-line bg-canvas/95 backdrop-blur-sm' }, [
     ui.div({ class: 'mx-auto flex h-full max-w-6xl items-center justify-between gap-3 px-3 min-[360px]:px-4 sm:px-6' }, [
     ui.a({ href: ui.link(home, null), class: 'rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand' }, [
-      ui.p({ class: 'flex items-center gap-2 font-serif text-xl font-bold whitespace-nowrap text-brand-strong sm:gap-3 sm:text-3xl' }, [
-        // The icon gives way on the narrowest phones so the header stays on one line.
-        ui.span({ class: 'max-[374px]:hidden' }, [sproutIcon()]),
-        '台灣當季蔬果',
-      ]),
+      isTitleHeading && ui.h1({ class: siteTitleClass }, siteTitle()),
+      !isTitleHeading && ui.p({ class: siteTitleClass }, siteTitle()),
     ]),
     ui.nav({ 'aria-label': '網站導覽' }, [
       ui.ul({ class: 'flex gap-3 sm:gap-5' }, [
@@ -640,7 +654,7 @@ export const Home = ui.view({
       ui.query(getToday, { month: search.month, show: search.show }, {
         ready: (today) =>
           ui.div({ class: 'space-y-12' }, [
-            ui.header({ class: 'space-y-6' }, [siteHeader('home'), dateCard(today), monthNav(today), searchForm(null)]),
+            ui.header({ class: 'space-y-6' }, [siteHeader('home', true), dateCard(today), monthNav(today), searchForm(null)]),
             sectionTabs(),
             filterBar(today, search.month),
             picksSection(today),
@@ -657,7 +671,7 @@ export const SearchPage = ui.view({
   route: searchPage,
   render: ({ search }) =>
     ui.main({ class: `${pageMain} space-y-12` }, [
-      ui.header({ class: 'space-y-6' }, [siteHeader('search'), searchForm(search.q)]),
+      ui.header({ class: 'space-y-6' }, [siteHeader('search', false), searchForm(search.q)]),
       ui.query(searchProduce, { q: search.q ?? '' }, {
         ready: (result) => searchResults(result),
         failed: { Unexpected: () => unavailable('搜尋暫時無法使用，請稍後再試。') },
@@ -670,7 +684,7 @@ export const FavoritesPage = ui.view({
   route: favoritesPage,
   render: () =>
     ui.main({ class: `${pageMain} space-y-12` }, [
-      ui.header({}, [siteHeader('favorites')]),
+      ui.header({}, [siteHeader('favorites', false)]),
       ui.query(listCatalog, {}, {
         ready: (cards) => favoritesSection(cards),
         failed: { Unexpected: () => unavailable('暫時無法載入蔬果資料，請稍後再試。') },
@@ -683,7 +697,7 @@ export const ProducePage = ui.view({
   route: produceItem,
   render: ({ params }) =>
     ui.main({ class: `${pageMain} space-y-12` }, [
-      ui.header({}, [siteHeader('home')]),
+      ui.header({}, [siteHeader('home', false)]),
       ui.query(getProduceDetail, { id: params.id }, {
         ready: (detail) => produceDetail(detail),
         failed: {
@@ -691,6 +705,28 @@ export const ProducePage = ui.view({
           Unexpected: () => unavailable('暫時無法載入這項蔬果，請稍後再試。'),
         },
       }),
+      footerNote(),
+    ]),
+})
+
+const notFoundLinkClass = 'inline-flex min-h-11 items-center text-base font-medium text-brand-strong underline underline-offset-4'
+
+/** Any address no route matches (rendered with status 404). */
+export const NotFoundPage = ui.view({
+  route: notFound,
+  render: () =>
+    ui.main({ class: `${pageMain} space-y-12` }, [
+      ui.header({}, [siteHeader('home', false)]),
+      ui.section({ class: sectionShell }, [
+        sectionHeading('找不到頁面', '這裡沒有蔬果', true),
+        ui.div({ class: 'space-y-4' }, [
+          ui.p({ class: 'text-base text-ink' }, ['這個網址沒有對應的頁面，可能是網址打錯了，或頁面已經移除。']),
+          ui.ul({ class: 'flex flex-wrap gap-x-6 gap-y-2' }, [
+            ui.li({}, [ui.a({ href: ui.link(home, null), class: notFoundLinkClass }, ['看本月當季蔬果'])]),
+            ui.li({}, [ui.a({ href: ui.link(searchPage, null), class: notFoundLinkClass }, ['搜尋蔬果'])]),
+          ]),
+        ]),
+      ]),
       footerNote(),
     ]),
 })

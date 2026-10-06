@@ -27,7 +27,7 @@ const TITLE_HINTS: Record<string, string[]> = {}
 /**
  * Chosen by hand after reviewing every photo: a Commons file (without "File:") when the article's lead image
  * isn't the produce itself (a plant, a botanical drawing, an unrelated photo), or null for no photo when no
- * free candidate fits (e.g. Commons "murcott" results are tango dancers).
+ * free candidate fits (Commons has no 桂竹筍 or 茂谷柑 photo; its "murcott" results are other tangors or places).
  */
 const PHOTO_OVERRIDES: Record<string, string | null> = {
   cucumber: 'Kurkkuja.jpg',
@@ -55,11 +55,11 @@ const PHOTO_OVERRIDES: Record<string, string | null> = {
   banana: 'Bunch of bananas on sale.jpg',
   papaya: 'Carica papaya - papaya - var-tropical dwarf papaya - desc-fruit.jpg',
   'honey-peach': 'Autumn Red peaches.jpg',
-  'crown-daisy': null,
-  ginger: null,
+  'crown-daisy': 'Tần ô.jpg',
+  ginger: 'Young ginger (20240608).jpg',
   'makino-bamboo': null,
   murcott: null,
-  pomelo: null,
+  pomelo: 'Pomelo fruit.jpg',
 }
 
 interface PhotoCredit {

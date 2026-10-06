@@ -24,5 +24,8 @@ export const produceItem = route({ path: '/produce/:id', params: z.object({ id: 
 /** The visitor's favourites, kept in their browser's localStorage. */
 export const favoritesPage = route({ path: '/favorites', params: null, search: null })
 
+/** Rendered with status 404 for any address no route matches (`notFound` in hozu.config.ts). */
+export const notFound = route({ path: '/not-found', params: null, search: null })
+
 /** The starter page `create-hozu` generated, kept for reference. */
 export const demo = route({ path: '/demo', params: null, search: null })
