@@ -5,7 +5,7 @@ Every query and mutation declares `runs` (required, no default): what its implem
 | `runs` | The implementation needs | Implemented in |
 |---|---|---|
 | `'server'` | a database, a server secret, the session | `app.ts` / `features/<name>/server.ts` resolvers |
-| `'browser'` | the visitor's browser credentials (a token in `localStorage`, an OIDC library, the API's own cookies) | `features/<name>/fetch.ts` |
+| `'browser'` | the visitor's own data in the browser (a list in `localStorage`), or browser credentials (a token, an OIDC library, the API's own cookies) | `features/<name>/fetch.ts` |
 | `'either'` | nothing special: a public API, or your own API with CORS | `features/<name>/fetch.ts` |
 
 ```ts
@@ -61,7 +61,6 @@ export const repos = feature({ id: 'repos', intent, declarations: [model, views]
   run time shows in `hozu browse`.
 - The bundle (`bundleComponents`) carries fetch.ts for the browser.
 - **Rules:** HZ081 (a missing or extra export, or `'either'` with user data), HZ082 (a `'browser'` query in a page
-  `head` or `entries`; a browser mutation that invalidates a tag a server-cached query reads), HZ036 (a form that
-  starts a `'browser'` mutation needs JS).
+  `head` or `entries`; a browser mutation that invalidates a tag a server-cached query reads).
 - **Static host:** pages with only `'browser'` / `'either'` data export completely; `exportStatic` lists in
   `needsServer` the server effects a page would still call.

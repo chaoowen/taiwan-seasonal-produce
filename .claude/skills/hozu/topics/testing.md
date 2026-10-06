@@ -7,8 +7,6 @@
   `hozu call api.who --input '{"room":"a"}' --header 'Authorization: Bearer t'` (a POST needs `--write`).
 - **Drive the app in a real browser, still without a server:**
   `hozu browse / --session '{"user":"ada"}' --do 'fill New note=Milk' --do 'press Enter' --do 'click Pin in "Milk"'`.
-  - `--js both` (the default) runs every step with JS and with JS switched off; submit with `press Enter` or
-    `submit "<form>"` so one step list drives both.
   - Steps: `fill <label>=<value>`, `select <label>=<option>`, `check` / `uncheck <label>`, `click <name>`,
     `submit "<form>"`, `press <key>`, `wait <ms>`, `goto <path>`, `post <path> a=1&b=2`,
     `remember <name> from url|<selector> [@attr]` (later steps read `$name`); a target may end with `in "<text>"`
@@ -16,9 +14,16 @@
   - Labels are what `hozu get <page> --forms` lists; a missing one prints `Did you mean "…"?`. One `--do` may hold
     several steps: `--do 'fill Title=Milk; press Enter'`.
 - **Other users, other pages, after a reload, after sign-out:** verify any such statement once, in one `browse`
-  chain with `--js both`. `--as <name>` starts an actor with its own browser; all actors share one app.
+  chain. `--as <name>` starts an actor with its own browser; all actors share one app.
+  - A stale form (sent after the data changed elsewhere): `--do 'remember save from form:has([name=title]) @action'`,
+    change the data as another `--as`, then `--do 'post $save title=x'`. No server and no curl needed.
 - **The output** is per step only the lines added (`+`) or removed (`−`). A passing six-step run stays under 1.5 KB.
   Exit code 1 when a step failed, the modes differ or an error was printed.
+- **A step that reloads the page** with JS on says `the page reloaded` (a form that should update in place);
+  `--full` adds `N elements replaced` (a region drawn again), `--json` has both as `document` / `replaced`.
+- **A pending state:** `--do 'hold notes.addNote'` keeps that mutation back (server- or browser-run); the next steps
+  (and `--screenshot`) see the busy UI; `--do 'release'` lets it finish.
+- `browse` runs the `npm start` app: what only `hozu dev` does (reload on edits, DevTools) is not in it.
 - In code: `const page = await testApp(app).get('/')` from `@hozu/testing` → `{ status, headers, html, text, payload }`.
 - A build with errors renders nothing: run `hozu check`.
 
@@ -35,7 +40,7 @@
 - **`hozu browse`:**
   - It uses the installed Chrome / Chromium / Edge (`HOZU_CHROME=/path` to choose); without one it is a config
     error. The app runs in-process, exactly as `npm start` serves it.
-  - `--js both` runs both modes in the same Chrome, side by side. Use `--js on` or `--js off` for one mode.
+  - `--js off` runs the steps with JS switched off, `--js both` side by side: for a page that must work without it.
   - Steps in detail: a second fill of a repeated name fills the next field; `check` / `uncheck` set the state;
     `click <name>` on a submit button posts with its name and value; `submit "<form>"` takes a form's `aria-label` or
     its submit button text. Labels and names are what a user reads (aria-label, `<label>`, placeholder, button text,
@@ -63,7 +68,8 @@
   - To forge a post, take the form's `action` from `hozu get <page> --forms` or `remember … @action` on a page the
     server rendered (`goto` it first): forms the client renders after a change carry no `action`.
   - Exit code 1 also when a client component failed. `--json` has every line; `--full` prints them all;
-    `--select <css>`, `--screenshot shot.png` and `--reduced-motion` as before.
+    `--select <css>`, `--screenshot shot.png` (after the steps), `--viewport 390x844` (a phone; default 1280x800) and
+    `--reduced-motion`.
   - It also prints the client components on the page (mounted, failed, size, canvases).
 - **`testApp`:** `app` is the default export of `app.ts`; `.post(path, fields)` submits a native form, with fields as
   a record or as `[name, value]` pairs for repeated names. `testApp(app, { session: store })` may swap only the
