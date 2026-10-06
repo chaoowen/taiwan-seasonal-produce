@@ -8,7 +8,8 @@ export const Produce = z.object({
   name: z.string(),
   kind: Kind,
   origin: z.string(),
-  tip: z.string(),
+  /** Null for crops the open data added that have no hand-written tip yet. */
+  tip: z.string().nullable(),
   /** Recommended because the month is its peak season. */
   isPeak: z.boolean(),
   /** Recommended because its wholesale price is at least 10% below the last 30 days. */

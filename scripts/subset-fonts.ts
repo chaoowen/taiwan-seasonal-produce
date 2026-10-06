@@ -11,7 +11,7 @@ import { mkdir, readdir, readFile, stat, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import subsetFont from 'subset-font'
 
-const SOURCE_DIRS = ['features']
+const SOURCE_DIRS = ['features', 'data']
 const SOURCE_FILES = ['hozu.config.ts', 'routes.ts', 'app.css']
 const CACHE_DIR = '.cache/fonts'
 const OUT_DIR = 'assets/fonts'

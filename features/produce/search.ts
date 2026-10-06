@@ -13,10 +13,10 @@ const EXTRA_ALIASES: Record<string, string[]> = {
   pomelo: ['柚子', '文旦'],
 }
 
-/** The item's own name, its MOA crop names ("甘藍-初秋" → "甘藍") and everyday aliases. */
+/** The item's own name, its AFA and MOA crop names ("甘藍-初秋" → "甘藍") and everyday aliases. */
 function getSearchNames(item: CatalogItem): string[] {
   const marketNames = (MARKET_NAMES[item.id]?.patterns ?? []).map((pattern) => pattern.split('-')[0] ?? pattern)
-  return [item.name, ...marketNames, ...(EXTRA_ALIASES[item.id] ?? [])]
+  return [item.name, ...item.aliases, ...marketNames, ...(EXTRA_ALIASES[item.id] ?? [])]
 }
 
 /** Consecutive runs of months, wrapping past December: [12, 1, 2] is one run. */

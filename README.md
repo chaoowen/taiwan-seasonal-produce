@@ -7,7 +7,7 @@
 | 頁面 | 網址 | 說明 |
 | ---- | ---- | ---- |
 | 首頁 | `/` | 依台灣時間（Asia/Taipei）判斷當月：建議購買、當季蔬菜、當季水果 |
-| 搜尋 | `/search?q=草莓` | 搜尋全部 59 種蔬果（不限當季），可用官方品名，例如「甘藍」找到高麗菜 |
+| 搜尋 | `/search?q=草莓` | 搜尋全部 77 種蔬果（不限當季），可用官方品名，例如「甘藍」找到高麗菜、「結球白菜」找到大白菜 |
 | 我的收藏 | `/favorites` | 收藏的蔬果（不限當季），存在瀏覽器的 localStorage |
 | 範本首頁 | `/demo` | `create-hozu` 產生的範本，保留對照用 |
 
@@ -41,6 +41,7 @@ npm run dev      # 開發伺服器：http://127.0.0.1:3000
 | `npm run check` | 型別與 Hozu 規則檢查，提交前請先跑過 |
 | `npm start` | 正式模式啟動（Node） |
 | `npm run build` | 建置（Node） |
+| `npm run sync:catalog` | 從農糧署開放資料更新 `data/afa-peak-season.json`（每週自動執行並開 PR） |
 | `npm run fonts` | 重新產生字型子集 `assets/fonts/*.woff2`（新增中文字後執行） |
 | `npm run snapshot:prices` | 抓農業部行情、產生價格快照 `.cache/price-snapshot.json` |
 | `npm run build:worker` | 字型子集＋建置＋價格快照＋打包 Cloudflare Worker（`dist/worker/`） |
@@ -52,8 +53,11 @@ npm run dev      # 開發伺服器：http://127.0.0.1:3000
 ## 專案結構
 
 ```
+data/
+  afa-peak-season.json  農糧署開放資料整理結果（腳本產生，勿手改）
 features/produce/
-  catalog.ts       59 種蔬果資料：產季、盛產月、產地、挑選技巧
+  crop-profiles.ts 人工資料：顯示名稱、挑選技巧、已驗證的盛產月、與官方品名的對照、官方沒有的品項
+  catalog.ts       合併開放資料與人工資料，產生 77 種蔬果目錄
   market-names.ts  常見名稱 ↔ 農業部官方品名對照（高麗菜 = 甘藍）
   moa-client.ts    呼叫農業部 API、磁碟／記憶體快取
   market.ts        即時計算：各市場加權平均價、與近 30 天比較的漲跌
@@ -75,15 +79,30 @@ worker/
   index.ts         Cloudflare Worker 入口（載入價格快照）
   bundle-stub.ts   取代 @hozu/bundle（Worker 不需要執行期打包工具）
 scripts/
+  sync-catalog.ts     下載並整理農糧署「每月盛產農產品產地」
   subset-fonts.ts     產生只含網站用字的 Noto TC 字型（見下方「字型」）
   price-snapshot.ts   產生價格快照（農業部失敗時寫入「無價格」快照，不擋部署）
   build-worker.ts     以 esbuild＋Hozu 外掛打包 Worker
   worker-manifest.ts  校正 Worker 的建置紀錄雜湊（見下方「Hozu 元件與 Workers」）
 wrangler.jsonc     Cloudflare 設定
-.github/workflows/deploy.yml  自動部署
+.github/workflows/deploy.yml        自動部署
+.github/workflows/sync-catalog.yml  每週同步開放資料，有變動就開 PR
 ```
 
 ## 資料來源與推薦邏輯
+
+### 蔬果目錄（當季月份、產地）
+
+| 來源 | 內容 | 維護方式 |
+| ---- | ---- | -------- |
+| 農糧署「[每月盛產農產品產地](https://data.gov.tw/dataset/8120)」 | 64 種蔬果的盛產月份、主要產地縣市 | `scripts/sync-catalog.ts` 每週同步，變動時開 PR 審核 |
+| `crop-profiles.ts`（人工） | 顯示名稱、挑選技巧、已驗證的盛產月；官方未收錄的 13 種（茼蒿、蘆筍、南瓜、空心菜、地瓜葉、冬瓜、秋葵、嫩薑、蓮藕、芋頭、菱角、甜玉米、桑椹） | 手動 |
+
+- **當季** = 官方盛產月份。**盛產（建議購買用）**：原有品項沿用已驗證的盛產月（與官方月份取交集）；新品項取「產地數達最多月份 75% 以上」的月份；若每月產地數相同（無高峰訊號），就不設盛產月，只在價格划算時推薦。
+- **官方資料的已知問題**：鳳梨主要產區（屏東、臺南）的資料列沒有月份，同步時被略過，所以鳳梨改以人工維護（`supersedes`）。
+- 官方新增、但還沒寫 profile 的作物會自動出現在網站上，只是沒有挑選技巧。
+
+### 價格
 
 價格來自農業部「[農產品交易行情](https://data.moa.gov.tw/)」開放資料（免金鑰），為**批發價**，零售價約為其 1.5–2 倍。推薦條件：**盛產期，或批發價比近 30 天便宜 10% 以上**。
 
@@ -129,7 +148,7 @@ Hozu 0.17 用 `sha256(String(render))` 當作 `ui.component` 的指紋，並納�
 2. 用 `hozu inspect --json` 逐一比對每個 feature，**只允許元件層級的 `sourceHash` 不同**；任何其他差異都會讓建置失敗（代表建置真的過期）
 3. 產生 `dist/worker/manifest.json`（只換掉 `irHash`），再打包一次
 
-這個做法依賴 Hozu 內部的檢查程式碼；若 Hozu 改版導致找不到，建置會明確報錯。等 Hozu 修正後即可移除。
+這個做法依賴 Hozu 內部的檢查程式碼；若 Hozu 改版導致找不到，建置會明確報錯。已回報 Hozu（[olevatorr/Hozu#1](https://github.com/olevatorr/Hozu/issues/1)，0.17.1 與 0.19.0 皆可重現），修正後即可移除。
 
 ## 字型
 
@@ -143,6 +162,7 @@ Noto Sans TC（內文）與 Noto Serif TC（標題）使用**子集字型**：`s
 | 素材 | 授權 |
 | ---- | ---- |
 | 農業部農產品交易行情 | [政府資料開放授權條款](https://data.gov.tw/license) |
+| 農糧署每月盛產農產品產地 | [政府資料開放授權條款](https://data.gov.tw/license) |
 | Noto Sans TC／Noto Serif TC（子集，來源 Google Fonts） | SIL Open Font License 1.1 |
 | Lucide 圖示 | ISC |
 | 背景圖 `assets/linen.jpg` | ⚠️ **來源授權未確認**，正式上線前請替換為有明確授權的素材 |
@@ -153,5 +173,6 @@ Noto Sans TC（內文）與 Noto Serif TC（標題）使用**子集字型**：`s
 - 線上版的價格每天更新一次（早上 6 點部署時），不是即時行情。
 - 收藏只存在單一瀏覽器，無法跨裝置同步。
 - 收藏頁會先輸出全部 59 張卡片再由瀏覽器篩選，HTML 較大（約 200 KB，傳輸時會壓縮）。
-- 目錄收錄 59 種台灣常見蔬果，不在目錄中的品項搜尋不到。
+- 目錄收錄 77 種台灣常見蔬果，不在目錄中的品項搜尋不到。
+- 官方開放資料「不定期」更新；每週同步產生的 PR 需要人工合併才會生效。
 - 區塊副標題為白字，在米白背景上對比度約 1.1:1，未達 WCAG AA。
