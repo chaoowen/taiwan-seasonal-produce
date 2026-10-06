@@ -8,13 +8,12 @@
     "start": "hozu serve",
     "build": "hozu build",
     "snapshot:prices": "node scripts/price-snapshot.ts",
-    "build:worker": "hozu build && node scripts/price-snapshot.ts && node scripts/build-worker.ts",
+    "build:worker": "node scripts/subset-fonts.ts && hozu build && node scripts/price-snapshot.ts && node scripts/build-worker.ts",
     "preview:worker": "npm run build:worker && wrangler dev",
-    "deploy": "npm run build:worker && wrangler deploy"
+    "deploy": "npm run build:worker && wrangler deploy",
+    "fonts": "node scripts/subset-fonts.ts"
   },
   "dependencies": {
-    "@fontsource-variable/noto-sans-tc": "^5.3.0",
-    "@fontsource-variable/noto-serif-tc": "^5.3.0",
     "@hozu/adapter-node": "^0.17.1",
     "@hozu/bundle": "^0.17.1",
     "@hozu/cli": "^0.17.1",
@@ -31,6 +30,7 @@
     "@hozu/testing": "^0.17.1",
     "@types/node": "^22.20.4",
     "esbuild": "^0.28.2",
+    "subset-font": "^2.9.0",
     "typescript": "^7.0.2",
     "wrangler": "^4.147.0"
   },

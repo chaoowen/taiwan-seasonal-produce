@@ -41,8 +41,9 @@ npm run dev      # 開發伺服器：http://127.0.0.1:3000
 | `npm run check` | 型別與 Hozu 規則檢查，提交前請先跑過 |
 | `npm start` | 正式模式啟動（Node） |
 | `npm run build` | 建置（Node） |
+| `npm run fonts` | 重新產生字型子集 `assets/fonts/*.woff2`（新增中文字後執行） |
 | `npm run snapshot:prices` | 抓農業部行情、產生價格快照 `.cache/price-snapshot.json` |
-| `npm run build:worker` | 建置＋價格快照＋打包 Cloudflare Worker（`dist/worker/`） |
+| `npm run build:worker` | 字型子集＋建置＋價格快照＋打包 Cloudflare Worker（`dist/worker/`） |
 | `npm run preview:worker` | 在本機用 Cloudflare 執行環境（workerd）預覽：http://127.0.0.1:8787 |
 | `npm run deploy` | 手動部署到 Cloudflare（需先 `npx wrangler login`） |
 
@@ -74,6 +75,7 @@ worker/
   index.ts         Cloudflare Worker 入口（載入價格快照）
   bundle-stub.ts   取代 @hozu/bundle（Worker 不需要執行期打包工具）
 scripts/
+  subset-fonts.ts     產生只含網站用字的 Noto TC 字型（見下方「字型」）
   price-snapshot.ts   產生價格快照（農業部失敗時寫入「無價格」快照，不擋部署）
   build-worker.ts     以 esbuild＋Hozu 外掛打包 Worker
   worker-manifest.ts  校正 Worker 的建置紀錄雜湊（見下方「Hozu 元件與 Workers」）
@@ -129,12 +131,19 @@ Hozu 0.17 用 `sha256(String(render))` 當作 `ui.component` 的指紋，並納�
 
 這個做法依賴 Hozu 內部的檢查程式碼；若 Hozu 改版導致找不到，建置會明確報錯。等 Hozu 修正後即可移除。
 
+## 字型
+
+Noto Sans TC（內文）與 Noto Serif TC（標題）使用**子集字型**：`scripts/subset-fonts.ts` 從 Google Fonts 下載完整可變字型（快取於 `.cache/fonts/`），只保留原始碼中出現的字、英數字與常用標點，輸出 `assets/fonts/*.woff2`（合計約 470 KB，字重 400–700）。
+
+- **為什麼**：Hozu 會預載入 CSS 裡每個本地字型檔；Fontsource 版本拆成約 200 個檔案，每次開頁要下載約 15 MB，並拖住客戶端腳本。
+- **新增中文字後**：執行 `npm run fonts`（部署時會自動重新產生）。不在子集裡的字（例如使用者搜尋的罕見字）會改用系統字型顯示。
+
 ## 授權與素材
 
 | 素材 | 授權 |
 | ---- | ---- |
 | 農業部農產品交易行情 | [政府資料開放授權條款](https://data.gov.tw/license) |
-| Noto Sans TC／Noto Serif TC（Fontsource） | SIL Open Font License 1.1 |
+| Noto Sans TC／Noto Serif TC（子集，來源 Google Fonts） | SIL Open Font License 1.1 |
 | Lucide 圖示 | ISC |
 | 背景圖 `assets/linen.jpg` | ⚠️ **來源授權未確認**，正式上線前請替換為有明確授權的素材 |
 
