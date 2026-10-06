@@ -149,6 +149,7 @@ flowchart LR
     V([訪客]) --> W
 ```
 
+- **頁面快取**：公開查詢使用 `freshness: { revalidate: 300 }`，頁面在伺服器端快取 5 分鐘（`x-hozu-cache` 標示命中與否；瀏覽器端 `max-age=0, must-revalidate`，不會看到過期頁面）。價格只隨部署更新；午夜換日後最多 5 分鐘仍顯示前一天。實測重複請求：搜尋頁 17.6 → 1.8 ms。
 - **免費方案即可**：價格事先算好，每次請求在 workerd 實測平均約 1.2 ms（免費方案上限 10 ms CPU）。
 - **自動部署**：`.github/workflows/deploy.yml` 在 push 到 `main`、每天 06:00 與 09:00（台灣時間；09:00 為備援，GitHub 排程可能延遲或略過）與手動觸發時部署。
 - **價格過期提醒**：`price-watch.yml` 每天 12:00 讀取 `/api/status`；快照超過 48 小時、沒有價格、或最近交易日超過 4 天時，自動開 issue「價格資料過期（自動偵測）」（已開則留言），恢復後自動關閉。需要在 GitHub repo 設定兩個 secrets：
