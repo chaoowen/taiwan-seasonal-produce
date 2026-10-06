@@ -47,6 +47,8 @@ npm run dev      # 開發伺服器：http://127.0.0.1:3000
 | `npm start` | 正式模式啟動（Node） |
 | `npm run build` | 建置（Node） |
 | `npm run sync:catalog` | 從農糧署開放資料更新 `data/afa-peak-season.json`（每週自動執行並開 PR） |
+| `npm run sync:volume` | 階段 B：抓過去 12 個完整月份的農業部交易量（`data/moa-monthly-volume.json`） |
+| `npm run compare:peaks` | 階段 B：比較交易量盛產月與現有盛產月，輸出 `docs/phase-b-peak-comparison.md` |
 | `npm run fonts` | 重新產生字型子集 `assets/fonts/*.woff2`（新增中文字後執行） |
 | `npm run snapshot:prices` | 抓農業部行情、產生價格快照 `.cache/price-snapshot.json` |
 | `npm run share-image` | 產生首頁分享圖卡 `assets/share.jpg`（需要 Chrome；先有價格快照會更準） |
