@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "hozu dev",
     "check": "hozu check",
+    "test": "node --import @hozu/transform/register --test \"tests/*.test.ts\"",
     "start": "hozu serve",
     "build": "hozu build",
     "snapshot:prices": "node scripts/price-snapshot.ts",
