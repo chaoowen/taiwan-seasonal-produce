@@ -58,6 +58,35 @@ const changeText = part((item: Item) =>
   ),
 )
 
+/** 30-day price sparkline: violet when the price is down, like the 便宜 text; described for screen readers. */
+const trendLine = part((item: Item) =>
+  item.trendPath !== null &&
+  ui.svg(
+    {
+      viewBox: '0 0 100 28',
+      preserveAspectRatio: 'none',
+      role: 'img',
+      'aria-label': item.trendLabel ?? '',
+      class: 'h-7 w-full',
+      toggle: { 'text-bargain': item.trend === 'down', 'text-ink-muted': item.trend !== 'down' },
+    },
+    [
+      ui.path(
+        {
+          d: item.trendPath,
+          fill: 'none',
+          stroke: 'currentColor',
+          'stroke-width': '1.5',
+          'stroke-linejoin': 'round',
+          'stroke-linecap': 'round',
+          'vector-effect': 'non-scaling-stroke',
+        },
+        [],
+      ),
+    ],
+  ),
+)
+
 const tipBox = part((tip: string) =>
   ui.p({ class: 'rounded-md bg-accent-surface px-4 py-3 text-base text-ink' }, [
     ui.span({ class: 'font-bold text-accent-strong' }, ['挑選技巧　']),
@@ -97,6 +126,7 @@ const pickCard = part((item: Item) =>
         ui.span({ class: 'text-base font-bold text-ink tabular-nums' }, ['批發價 ', item.priceLabel]),
         changeText(item),
       ]),
+    trendLine(item),
     item.tip !== null && tipBox(item.tip),
   ]),
 )
@@ -112,6 +142,7 @@ const produceCard = part((item: Item) =>
     item.priceLabel !== null &&
       ui.p({ class: 'mt-auto pt-1 text-base font-medium text-ink tabular-nums' }, [item.priceLabel]),
     changeText(item),
+    trendLine(item),
   ]),
 )
 
@@ -134,6 +165,7 @@ const catalogCard = part((item: CatalogCard, isHidden: boolean) =>
         ui.span({ class: 'text-base font-bold text-ink tabular-nums' }, ['批發價 ', item.priceLabel]),
         changeText(item),
       ]),
+    trendLine(item),
     item.tip !== null && tipBox(item.tip),
   ]),
 )

@@ -2,6 +2,7 @@ import { CATALOG, type CatalogItem } from './catalog.ts'
 import type { ItemPrice } from './market.ts'
 import { getPriceSummary } from './prices.ts'
 import { getTaipeiDate } from './taipei-date.ts'
+import { toTrend } from './trend.ts'
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
 const SEASONS = ['冬季', '冬季', '春季', '春季', '春季', '夏季', '夏季', '夏季', '秋季', '秋季', '秋季', '冬季']
@@ -19,6 +20,11 @@ function getChangeLabel(changePct: number): { changeLabel: string; trend: 'down'
   return { changeLabel: '與近 30 天持平', trend: 'flat' }
 }
 
+function sparkline(price: ItemPrice | null): { trendPath: string | null; trendLabel: string | null } {
+  const trend = price ? toTrend(price.series) : null
+  return { trendPath: trend?.path ?? null, trendLabel: trend?.label ?? null }
+}
+
 export function toProduce(item: CatalogItem, month: number, price: ItemPrice | null) {
   const { id, name, kind, origin, tip } = item
   const change = price?.changePct != null ? getChangeLabel(price.changePct) : null
@@ -29,6 +35,7 @@ export function toProduce(item: CatalogItem, month: number, price: ItemPrice | n
     priceLabel: price ? `每公斤 ${Math.round(price.price)} 元` : null,
     changeLabel: change?.changeLabel ?? null,
     trend: change?.trend ?? null,
+    ...sparkline(price),
   }
 }
 
