@@ -54,12 +54,14 @@
 
 /*
  * Layout offsets shared by the fixed header, the sticky section tabs and in-page jumps (#picks, …):
- * the header is exactly --header-height tall, the tabs stick right under it, and a section scrolled to
- * stops below both (header + 53px tabs + 16px breathing room).
+ * the header is exactly --header-height tall, the tabs exactly --tabs-height and stuck right under it, and a
+ * section scrolled to stops below both plus 16px. Both elements take their height from these variables, so
+ * changing their styles can't silently shift the offsets.
  */
 :root {
   --header-height: 77px;
-  --section-offset: calc(var(--header-height) + 53px + 16px);
+  --tabs-height: 44px;
+  --section-offset: calc(var(--header-height) + var(--tabs-height) + 16px);
 }
 
 html {

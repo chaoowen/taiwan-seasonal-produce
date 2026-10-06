@@ -439,7 +439,7 @@ const sectionTab = part((label: string, href: string) =>
       {
         href,
         class:
-          'inline-flex min-h-11 items-center whitespace-nowrap px-1 text-base font-medium text-brand-strong decoration-2 underline-offset-8 transition-colors duration-200 hover:underline active:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+          'inline-flex min-h-11 items-center whitespace-nowrap px-1 text-base font-medium text-brand-strong decoration-2 underline-offset-8 transition-colors duration-200 hover:underline active:text-brand aria-[current=true]:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
       },
       [label],
     ),
@@ -451,7 +451,7 @@ const sectionTab = part((label: string, href: string) =>
  * stuck, then the filter bar's cream across the full width (StickyTabs + the `section-tabs` utility).
  */
 const sectionTabs = part(() =>
-  ui.use(StickyTabs, { class: 'section-tabs sticky top-(--header-height) z-30' }, [
+  ui.use(StickyTabs, { class: 'section-tabs sticky top-(--header-height) z-30 h-(--tabs-height)' }, [
     ui.nav({ 'aria-label': '頁面區塊' }, [
       ui.ul({ class: 'flex gap-6 overflow-x-auto' }, [
         sectionTab('當月建議購買', '#picks'),
