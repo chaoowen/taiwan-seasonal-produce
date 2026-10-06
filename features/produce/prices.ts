@@ -14,7 +14,7 @@ export type PriceSnapshot =
   | { generatedAt: string; tradeDateLabel: null }
 
 /** Where prices come from and how fresh they are: what /api/status reports and the freshness check reads. */
-export interface PriceSourceStatus {
+interface PriceSourceStatus {
   source: 'snapshot' | 'live'
   /** When the snapshot was built, or the live summary computed; null if it never succeeded. */
   generatedAt: string | null

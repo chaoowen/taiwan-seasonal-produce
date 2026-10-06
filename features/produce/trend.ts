@@ -9,7 +9,7 @@ const PAD = 2
 /** Fewer trading days than this give no meaningful line. */
 const MIN_POINTS = 3
 
-export interface Trend {
+interface Trend {
   /** SVG path data; a gap (no trades that day) starts a new segment. */
   path: string
   /** e.g. "近 30 天走勢：每公斤 45 → 31 元，最低 28、最高 52 元". */
