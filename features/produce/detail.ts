@@ -1,5 +1,6 @@
 import { CATALOG } from './catalog.ts'
 import { buildCatalogCards } from './catalog-cards.ts'
+import { getPhotoCredit } from './photos.ts'
 import { getTaipeiDate } from './taipei-date.ts'
 
 /**
@@ -17,5 +18,10 @@ export async function getProduceDetail(id: string, now: Date = new Date()) {
     level: item.peak.includes(month) ? ('peak' as const) : item.months.includes(month) ? ('season' as const) : ('off' as const),
     isCurrent: month === currentMonth,
   }))
-  return { item: card!, calendar, aliases: item.aliases.filter((alias) => alias !== item.name) }
+  return {
+    item: card!,
+    calendar,
+    aliases: item.aliases.filter((alias) => alias !== item.name),
+    photoCredit: getPhotoCredit(item.id),
+  }
 }

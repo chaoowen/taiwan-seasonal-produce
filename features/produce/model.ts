@@ -19,6 +19,8 @@ export const Produce = z.object({
   /** e.g. "比近 30 天便宜 18%". */
   changeLabel: z.string().nullable(),
   trend: z.enum(['down', 'up', 'flat']).nullable(),
+  /** Whether photos.css has a photo for this item (drawn via data-photo). */
+  hasPhoto: z.boolean(),
   /** 30-day sparkline (SVG path for a 100×28 viewBox) and its description; null without enough prices. */
   trendPath: z.string().nullable(),
   trendLabel: z.string().nullable(),
@@ -135,6 +137,8 @@ export const ProduceDetail = z.object({
   calendar: z.array(CalendarMonth),
   /** Official names it is also known by (e.g. 甘藍 for 高麗菜). */
   aliases: z.array(z.string()),
+  /** Wikimedia Commons attribution for the photo; null without one. */
+  photoCredit: z.object({ author: z.string(), license: z.string(), sourceUrl: z.string() }).nullable(),
 })
 
 /** One item's page; NotFound for an unknown id (the page answers 404). */
