@@ -4,8 +4,11 @@
  * average are candidate peak (盛產) months; scripts/compare-peaks.ts compares them with the current peaks.
  *
  * Usage: node scripts/sync-volume.ts   (~730 requests the first time; settled days come from .cache/moa)
+ *
+ * The window moves once a month, so when the file already covers it without failed days this does nothing
+ * (the weekly sync workflow runs it every Monday).
  */
-import { writeFile } from 'node:fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
 import { CATALOG } from '../features/produce/catalog.ts'
 import { MARKET_NAMES, matchesMarketName } from '../features/produce/market-names.ts'
 import { getTradeRows, type TradeType } from '../features/produce/moa-client.ts'
@@ -29,6 +32,12 @@ function windowDates(today: Date): { iso: string; roc: string; month: number }[]
   return dates
 }
 
+/** True when OUT_FILE already ends at `lastDate` with no failed days. */
+async function isUpToDate(lastDate: string): Promise<boolean> {
+  const existing = await readFile(OUT_FILE, 'utf8').then((text) => JSON.parse(text) as { to: string; failedDays: number }, () => null)
+  return existing !== null && existing.to === lastDate && existing.failedDays === 0
+}
+
 async function fetchDay(roc: string) {
   for (let attempt = 1; ; attempt++) {
     try {
@@ -42,6 +51,10 @@ async function fetchDay(roc: string) {
 
 const taipeiToday = new Date(new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Taipei' }).format(new Date()))
 const dates = windowDates(taipeiToday)
+if (await isUpToDate(dates.at(-1)!.iso)) {
+  console.log(`volume: ${OUT_FILE} already covers up to ${dates.at(-1)!.iso}`)
+  process.exit(0)
+}
 const days: ({ month: number; rows: Awaited<ReturnType<typeof fetchDay>> } | null)[] = new Array(dates.length).fill(null)
 let next = 0
 let done = 0

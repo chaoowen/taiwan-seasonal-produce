@@ -47,8 +47,8 @@ npm run dev      # 開發伺服器：http://127.0.0.1:3000
 | `npm start` | 正式模式啟動（Node） |
 | `npm run build` | 建置（Node） |
 | `npm run sync:catalog` | 從農糧署開放資料更新 `data/afa-peak-season.json`（每週自動執行並開 PR） |
-| `npm run sync:volume` | 階段 B：抓過去 12 個完整月份的農業部交易量（`data/moa-monthly-volume.json`） |
-| `npm run compare:peaks` | 階段 B：比較交易量盛產月與現有盛產月，輸出 `docs/phase-b-peak-comparison.md` |
+| `npm run sync:volume` | 抓過去 12 個完整月份的農業部交易量（`data/moa-monthly-volume.json`）；資料已是最新時不動作（每週自動執行，實際每月更新一次） |
+| `npm run compare:peaks` | 比較交易量盛產月與目前的盛產月，輸出 `docs/phase-b-peak-comparison.md` |
 | `npm run fonts` | 重新產生字型子集 `assets/fonts/*.woff2`（新增中文字後執行） |
 | `npm run snapshot:prices` | 抓農業部行情、產生價格快照 `.cache/price-snapshot.json` |
 | `npm run share-image` | 產生首頁分享圖卡 `assets/share.jpg`（需要 Chrome；先有價格快照會更準） |
@@ -63,12 +63,14 @@ npm run dev      # 開發伺服器：http://127.0.0.1:3000
 ```
 data/
   afa-peak-season.json  農糧署開放資料整理結果（腳本產生，勿手改）
+  moa-monthly-volume.json  各品項過去 12 個月的平均每日交易量（腳本產生，勿手改）
   photo-credits.json    品項照片的 Commons 檔名、作者、授權（腳本產生）
 assets/photos/     品項照片，640×480 JPEG（腳本產生）
 photos.css         每張照片一條 `[data-photo="…"]` 規則（腳本產生，app.css 匯入）
 features/produce/
   crop-profiles.ts 人工資料：顯示名稱、挑選技巧、已驗證的盛產月、與官方品名的對照、官方沒有的品項
   catalog.ts       合併開放資料與人工資料，產生 77 種蔬果目錄
+  volume-peaks.ts  由交易量算出盛產月（≥ 12 個月平均的 1.4 倍）
   market-names.ts  常見名稱 ↔ 農業部官方品名對照（高麗菜 = 甘藍）
   moa-client.ts    呼叫農業部 API、磁碟／記憶體快取
   market.ts        即時計算：各市場加權平均價、與近 30 天比較的漲跌、每日價格序列
@@ -95,6 +97,8 @@ worker/
   bundle-stub.ts   取代 @hozu/bundle（Worker 不需要執行期打包工具）
 scripts/
   sync-catalog.ts     下載並整理農糧署「每月盛產農產品產地」
+  sync-volume.ts      彙整農業部過去 12 個月的交易量
+  compare-peaks.ts    產生交易量與盛產月的比對報告
   fetch-photos.ts     從 Wikimedia Commons 取得自由授權照片、裁切壓縮、產生 photos.css
   subset-fonts.ts     產生只含網站用字的 Noto TC 字型（見下方「字型」）
   make-share-image.ts 產生每日分享圖卡（headless Chrome＋sharp）
@@ -105,7 +109,7 @@ scripts/
   worker-manifest.ts  校正 Worker 的建置紀錄雜湊（見下方「Hozu 元件與 Workers」）
 wrangler.jsonc     Cloudflare 設定
 .github/workflows/deploy.yml        自動部署
-.github/workflows/sync-catalog.yml  每週同步開放資料，有變動就開 PR
+.github/workflows/sync-catalog.yml  每週同步開放資料與交易量，有變動就開 PR
 .github/workflows/price-watch.yml   每日檢查價格是否過期，過期就開 issue、恢復就關閉
 .github/workflows/pages-watch.yml   每 3 小時檢查重要頁面（狀態碼、內容、回應時間），異常就開 issue、恢復就關閉
 hozu.lock.json     Hozu 記錄的端點與轉換（`hozu check --update-lock` 更新）
@@ -118,9 +122,11 @@ hozu.lock.json     Hozu 記錄的端點與轉換（`hozu check --update-lock` �
 | 來源 | 內容 | 維護方式 |
 | ---- | ---- | -------- |
 | 農糧署「[每月盛產農產品產地](https://data.gov.tw/dataset/8120)」 | 64 種蔬果的盛產月份、主要產地縣市 | `scripts/sync-catalog.ts` 每週同步，變動時開 PR 審核 |
+| 農業部「農產品交易行情」交易量 | 各品項每月平均每日交易量（過去 12 個完整月份） | `scripts/sync-volume.ts` 每週檢查、每月更新，變動時開 PR 審核 |
 | `crop-profiles.ts`（人工） | 顯示名稱、挑選技巧、已驗證的盛產月；官方未收錄的 13 種（茼蒿、蘆筍、南瓜、空心菜、地瓜葉、冬瓜、秋葵、嫩薑、蓮藕、芋頭、菱角、甜玉米、桑椹） | 手動 |
 
-- **當季** = 官方盛產月份。**盛產（建議購買用）**：原有品項沿用已驗證的盛產月（與官方月份取交集）；新品項取「產地數達最多月份 75% 以上」的月份；若每月產地數相同（無高峰訊號），就不設盛產月，只在價格划算時推薦。
+- **當季** = 官方盛產月份。**盛產（建議購買用）**：原有品項沿用已驗證的盛產月（與官方月份取交集）；新品項取「產地數達最多月份 75% 以上」的月份；仍然沒有盛產月的品項（例如全年供應的芭樂、木瓜），改用**交易量盛產月**：平均每日交易量 ≥ 12 個月平均 1.4 倍的月份，且只保留當季月份。交易量也找不到高峰時（香蕉、甜椒），就不設盛產月，只在價格划算時推薦。
+- **為什麼交易量只用來補缺**：交易量反映的是市場供應量，不完全等於產季。洋蔥、芋頭、南瓜這類可冷藏的作物，收成後會陸續出貨，交易量高峰比產季晚；已有盛產月的品項因此維持不變。逐項比對見 `docs/phase-b-peak-comparison.md`。
 - **官方資料的已知問題**：鳳梨主要產區（屏東、臺南）的資料列沒有月份，同步時被略過，所以鳳梨改以人工維護（`supersedes`）。
 - 官方新增、但還沒寫 profile 的作物會自動出現在網站上，只是沒有挑選技巧。
 
