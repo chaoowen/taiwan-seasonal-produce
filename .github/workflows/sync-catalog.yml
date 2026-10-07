@@ -6,8 +6,8 @@ name: Sync open-data catalog
 
 on:
   schedule:
-    # Mondays 01:00 UTC = 09:00 Asia/Taipei.
-    - cron: '0 1 * * 1'
+    # Mondays 01:13 UTC = 09:13 Asia/Taipei (off the hour, see deploy.yml).
+    - cron: '13 1 * * 1'
   workflow_dispatch:
 
 permissions:

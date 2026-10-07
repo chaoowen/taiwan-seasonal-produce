@@ -4,8 +4,8 @@ name: Price freshness watch
 
 on:
   schedule:
-    # 04:00 UTC = 12:00 Asia/Taipei, after both daily deploy slots.
-    - cron: '0 4 * * *'
+    # 04:23 UTC = 12:23 Asia/Taipei, after all three daily deploy slots (off the hour, see deploy.yml).
+    - cron: '23 4 * * *'
   workflow_dispatch:
 
 permissions:
