@@ -153,7 +153,7 @@ hozu.lock.json     Hozu 記錄的端點與轉換（`hozu check --update-lock` �
 flowchart LR
     subgraph GA[GitHub Actions]
       T1([push 到 main]) --> B
-      T2([每天 06:00 台灣時間]) --> B
+      T2([每天 06:47／08:17／10:37 台灣時間]) --> B
       B[hozu check → hozu build<br/>→ 價格快照 → 打包 Worker] --> D[wrangler deploy]
     end
     D --> W[Cloudflare Workers<br/>頁面＋打包好的價格快照]
@@ -163,9 +163,9 @@ flowchart LR
 
 - **頁面快取**：公開查詢使用 `freshness: { revalidate: 300 }`，頁面在伺服器端快取 5 分鐘（`x-hozu-cache` 標示命中與否；瀏覽器端 `max-age=0, must-revalidate`，不會看到過期頁面）。檔名帶雜湊的字型、圖片、CSS、元件 JS（`/_hozu/a/*`、`/_hozu/c/*`、`/_hozu/chunk-*`、`/_hozu/styles.*`）則由 `scripts/build-worker.ts` 寫入的 `_headers` 設為一年 `immutable`，回訪不必重新確認約 500 KB 的字型。價格只隨部署更新；午夜換日後最多 5 分鐘仍顯示前一天。實測重複請求：搜尋頁 17.6 → 1.8 ms。
 - **免費方案即可**：價格事先算好，每次請求在 workerd 實測平均約 1.2 ms（免費方案上限 10 ms CPU）。
-- **自動部署**：`.github/workflows/deploy.yml` 在 push 到 `main`、每天 06:00 與 09:00（台灣時間；09:00 為備援，GitHub 排程可能延遲或略過）與手動觸發時部署。
+- **自動部署**：`.github/workflows/deploy.yml` 在 push 到 `main`、每天 06:47、08:17、10:37（台灣時間）與手動觸發時部署。GitHub 排程忙碌時會延遲或略過（整點最嚴重，06:00 整點曾連續兩天被略過），所以排三個非整點時段，任一次成功就會更新當天價格。
 - **頁面監控**：`pages-watch.yml` 每 3 小時檢查首頁、搜尋、收藏、品項頁、`/api/status`、sitemap、robots 回應 200（不存在的品項回應 404）、首頁確實有「當月建議購買」、回應不超過 5 秒；異常時開 issue「網站頁面異常（自動偵測）」，恢復自動關閉。Cloudflare 端的錯誤（例如 1102 超出資源限制）可在後台 Workers → Metrics 查看；若要自動讀取，需替 API Token 加上 Account Analytics 讀取權限。
-- **價格過期提醒**：`price-watch.yml` 每天 12:00 讀取 `/api/status`；快照超過 48 小時、沒有價格、或最近交易日超過 4 天時，自動開 issue「價格資料過期（自動偵測）」（已開則留言），恢復後自動關閉。需要在 GitHub repo 設定兩個 secrets：
+- **價格過期提醒**：`price-watch.yml` 每天 12:23 讀取 `/api/status`；快照超過 48 小時、沒有價格、或最近交易日超過 4 天時，自動開 issue「價格資料過期（自動偵測）」（已開則留言），恢復後自動關閉。需要在 GitHub repo 設定兩個 secrets：
   - `CLOUDFLARE_API_TOKEN`：Cloudflare 後台 → My Profile → API Tokens → 用「Edit Cloudflare Workers」範本建立
   - `CLOUDFLARE_ACCOUNT_ID`：Cloudflare 後台 Workers 頁面右側
 - **手動部署**：`npx wrangler login` 後執行 `npm run deploy`。

@@ -6,7 +6,7 @@
  */
 const HOUR_MS = 60 * 60 * 1000
 const DAY_MS = 24 * HOUR_MS
-/** Two daily deploys (06:00, 09:00 Asia/Taipei) both missing for two days. */
+/** Every daily deploy slot (06:47, 08:17, 10:37 Asia/Taipei) missing for two days. */
 const MAX_SNAPSHOT_AGE_MS = 48 * HOUR_MS
 /** Markets close for holidays and typhoons; beyond this the data itself is stale. */
 const MAX_TRADE_AGE_DAYS = 4
